@@ -436,7 +436,7 @@ def delete_files_and_folders():
 def git_push():
     device_name = input("机型：")
     os_version = input("版本号：")
-    commit_text = "Database：Update"
+    commit_text = "feat: update"
     commit = f"{commit_text} {device_name} {os_version}"
     try:
         with open(JSON_V, "r") as file:
