@@ -1,0 +1,162 @@
+name: Analysis Tool For HyperOS
+
+on:
+  workflow_dispatch:
+    inputs:
+      device:
+        description: "设备类型"
+        required: true
+        type: choice
+        options:
+        - "Phone"
+        - "Pad"
+        - "Fold"
+        - "Flip"
+      link:
+        description: "ROM 链接"
+        required: true
+      push:
+        description: "上传数据库"
+        required: true
+        type: choice
+        options:
+        - "是"
+        - "否"
+      devicename:
+        description: "设备名"
+        required: false
+      osversion:
+        description: "系统版本"
+        required: false
+
+jobs:
+  Analyze:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install dependence
+      run: |
+        sudo apt-get install -y android-sdk-build-tools
+        pip install -r requirements.txt
+
+    - name: Set permission
+      run: |
+       chmod +x ./tools/Linux/x86_64/extract.erofs
+       chmod +x ./tools/Linux/x86_64/payload-dumper-go
+
+    - name: Download ROM
+      run: |
+        python main.py -d "${{ github.event.inputs.link }}"
+
+    - name: Switch device type
+      run: |
+        if [ "${{ github.event.inputs.device }}" = "Phone" ]; then
+            python main.py -t 0 ph
+          elif [ "${{ github.event.inputs.device }}" = "Pad" ]; then
+            python main.py -t 0 p
+          elif [ "${{ github.event.inputs.device }}" = "Fold" ]; then
+            python main.py -t 0 f
+          elif [ "${{ github.event.inputs.device }}" = "Flip" ]; then
+            python main.py -t 0 fp
+          else
+            echo "Invalid device specified."
+            exit 1
+          fi
+
+    - name: Unzip payload.bin
+      run: |
+        python main.py -p
+        rm *.zip
+
+    - name: Unzip img
+      run: |
+        python main.py -i
+        rm payload.bin
+    
+    - name: Unzip file
+      run: |
+        python main.py -f
+
+    - name: Remove exclude apk
+      run: |
+        python main.py -a
+
+    - name: Upload special apk
+      uses: actions/upload-artifact@v4
+      with:
+        name: Special_apk
+        path: |
+          output_apk/MIUIScreenRecorder.apk
+          output_apk/MIUIScreenRecorderLite.apk
+          output_apk/MIUISecurityCenter.apk
+          output_apk/MiuiHome.apk
+          output_apk/AiAsstVision.apk
+          
+    - name: Get version
+      run: |
+        python main.py -n
+
+    - name: Update database
+      run: |
+        python main.py -u
+
+    - name: Rename
+      run: |
+        python main.py -m
+
+    - name: Upload database
+      uses: actions/upload-artifact@v4
+      with:
+        name: Database
+        path: |
+          app_version.json
+          app_code.json
+
+    - name: Upload build.prop
+      uses: actions/upload-artifact@v4
+      with:
+        name: build.prop
+        path: |
+          product/etc/build.prop
+    
+    - name: Upload update apk
+      uses: actions/upload-artifact@v4
+      with:
+        name: Update_apk
+        path: |
+          update_apk
+          update_name_apk
+
+    - name: Push database
+      continue-on-error: true
+      run: |
+        python main.py -t 1 ph
+            git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+            git config --global user.name "${GITHUB_ACTOR}"
+        if [ "${{ github.event.inputs.device }}" = "Phone" ]; then
+            git add phone/
+          elif [ "${{ github.event.inputs.device }}" = "Pad" ]; then
+            git add pad/
+          elif [ "${{ github.event.inputs.device }}" = "Fold" ]; then
+            git add fold/
+          elif [ "${{ github.event.inputs.device }}" = "Flip" ]; then
+            git add flip/
+          else
+            exit 1
+          fi
+        if [ "${{ github.event.inputs.push }}" = "是" ]; then
+            git commit -m "Database：Update ${{ github.event.inputs.devicename }} ${{ github.event.inputs.osversion }} by Actions"
+            git push
+          elif [ "${{ github.event.inputs.push }}" = "否" ]; then
+            exit 0
+          else
+            exit 0
+          fi
+          
+    - name: Get Info
+      continue-on-error: true
+      run: |
+        python main.py -o
