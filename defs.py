@@ -207,7 +207,7 @@ def extract_files():
             subprocess.run([f"{tools_path}extract.erofs", "-i", image + ".img", "-x", "-T8"])
         
         # 搜索当前目录及其子目录中的 build.prop 文件 
-        with open(build_prop_path, "r") as file:
+        with open("./product/etc/build.prop", "r") as file:
             for line in file:
                 if line.startswith("ro.product.product.name"):
                     device_name = line.split("=")[1].strip()
@@ -462,7 +462,7 @@ def git_push():
 
 def get_info():
     try:
-        with open(build_prop_path, "r") as file:
+        with open("./product/etc/build.prop", "r") as file:
             lines = file.readlines()
             for key, label in properties.items():
                 for line in lines:

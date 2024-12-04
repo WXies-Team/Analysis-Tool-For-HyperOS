@@ -102,7 +102,3 @@ properties = {
               "ro.product.build.id": "基线",
               "ro.product.build.fingerprint": "指纹"
              }
-
-prop_search_path = [
-                    "product"
-                   ]
