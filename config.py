@@ -81,7 +81,7 @@ is_flip = [
            "ruyi"
           ]
 
-# 需要删除的文件夹
+# 需要删除的文件
 files_to_delete = [
                    "payload.bin", 
                    "product.img", 
