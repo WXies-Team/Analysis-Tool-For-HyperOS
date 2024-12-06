@@ -6,8 +6,12 @@ on:
       - 'v*'
 
 jobs:
-  release-notes:
+  Build:
     runs-on: ubuntu-latest
+    env:
+      version: "v${GITHUB_REF##*/}"
+
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -48,7 +52,6 @@ jobs:
 
       - name: Process
         run: |
-          version="v${GITHUB_REF##*/}"
           mkdir -p ./output
           mkdir -p "./Analysis-Tool-For-HyperOS-${version}-Windows-x86_64/tools"
           mkdir -p "./Analysis-Tool-For-HyperOS-${version}-Linux-arm64/tools"
