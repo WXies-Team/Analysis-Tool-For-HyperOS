@@ -8,10 +8,6 @@ on:
 jobs:
   Build:
     runs-on: ubuntu-latest
-    env:
-      version: "v${GITHUB_REF##*/}"
-
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -93,14 +89,14 @@ jobs:
           done
 
           zip -r "./Analysis-Tool-For-HyperOS-Linux-x86_64.zip" "./Analysis-Tool-For-HyperOS-Linux-x86_64/"
-          mv "./Analysis-Tool-For-HyperOS-Linux-x86_64.zip" output/Analysis-Tool-For-HyperOS-{{ env.version }}-Linux-x86_64.zip
+          mv "./Analysis-Tool-For-HyperOS-Linux-x86_64.zip" output/
           rm ./*.zip
           rm ./*.tar.gz
 
       - name: Upload action
         uses: actions/upload-artifact@v4
         with:
-          name: Analysis-Tool-For-HyperOS-{{ env.version }}-Linux-x86_64
+          name: Analysis-Tool-For-HyperOS-Linux-x86_64
           path: ./Analysis-Tool-For-HyperOS-Linux-x86_64/*
 
       - name: Download payload-dumper-go-Linux-arm64
@@ -131,14 +127,14 @@ jobs:
           done
 
           zip -r "./Analysis-Tool-For-HyperOS-Linux-arm64.zip" "./Analysis-Tool-For-HyperOS-Linux-arm64/"
-          mv "./Analysis-Tool-For-HyperOS-Linux-arm64.zip" output/Analysis-Tool-For-HyperOS-{{ env.version }}-Linux-arm64.zip
+          mv "./Analysis-Tool-For-HyperOS-Linux-arm64.zip" output/
           rm ./*.zip
           rm ./*.tar.gz
 
       - name: Upload action
         uses: actions/upload-artifact@v4
         with:
-          name: Analysis-Tool-For-HyperOS-{{ env.version }}-Linux-arm64
+          name: Analysis-Tool-For-HyperOS-Linux-arm64
           path: ./Analysis-Tool-For-HyperOS-Linux-arm64/*
           
       - name: Download payload-dumper-go-Windows-x86_64
@@ -170,14 +166,14 @@ jobs:
           done
 
           zip -r "./Analysis-Tool-For-HyperOS-Windows-x86_64" "./Analysis-Tool-For-HyperOS-Windows-x86_64/"
-          mv "./Analysis-Tool-For-HyperOS-Windows-x86_64.zip" output/Analysis-Tool-For-HyperOS-{{ env.version }}-Windows-x86_64.zip
+          mv "./Analysis-Tool-For-HyperOS-Windows-x86_64.zip" output/
           rm ./*.zip
           rm ./*.tar.gz
 
       - name: Upload action
         uses: actions/upload-artifact@v4
         with:
-          name: Analysis-Tool-For-HyperOS-{{ env.version }}-Windows-x86_64
+          name: Analysis-Tool-For-HyperOS-Windows-x86_64
           path: ./Analysis-Tool-For-HyperOS-Windows-x86_64/*
 
       - name: Download payload-dumper-go-Darwin-x86_64
@@ -208,14 +204,14 @@ jobs:
           done
 
           zip -r "./Analysis-Tool-For-HyperOS-Darwin-x86_64" "./Analysis-Tool-For-HyperOS-Darwin-x86_64/"
-          mv "./Analysis-Tool-For-HyperOS-Darwin-x86_64.zip" output/Analysis-Tool-For-HyperOS-{{ env.version }}-Darwin-x86_64.zip
+          mv "./Analysis-Tool-For-HyperOS-Darwin-x86_64.zip" output/
           rm ./*.zip
           rm ./*.tar.gz
 
       - name: Upload action
         uses: actions/upload-artifact@v4
         with:
-          name: Analysis-Tool-For-HyperOS-{{ env.version }}-Darwin-x86_64
+          name: Analysis-Tool-For-HyperOS-Darwin-x86_64
           path: ./Analysis-Tool-For-HyperOS-Darwin-x86_64/*
 
       - name: Download payload-dumper-go-Darwin-arm64
@@ -246,14 +242,14 @@ jobs:
           done
 
           zip -r "./Analysis-Tool-For-HyperOS-Darwin-arm64" "./Analysis-Tool-For-HyperOS-Darwin-arm64/"
-          mv "./Analysis-Tool-For-HyperOS-Darwin-arm64.zip" output/Analysis-Tool-For-HyperOS-{{ env.version }}-Darwin-arm64.zip
+          mv "./Analysis-Tool-For-HyperOS-Darwin-arm64.zip" output/
           rm ./*.zip
           rm ./*.tar.gz
 
       - name: Upload action
         uses: actions/upload-artifact@v4
         with:
-          name: Analysis-Tool-For-HyperOS-{{ env.version }}-Darwin-arm64
+          name: Analysis-Tool-For-HyperOS-Darwin-arm64
           path: ./Analysis-Tool-For-HyperOS-Darwin-arm64/
 
       - name: Release
