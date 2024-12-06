@@ -197,14 +197,14 @@ def extract_img():
     # -c 参数指定最大并发数为 8，-o 指定提取后的文件输出到当前目录下
     # -p 参数指定提取指定镜像，"payload.bin" 为输入文件
     partition_string = ",".join(partitions)
-    subprocess.run(["./payload-dumper-go", "-c", "8", "-o","./", "-p", partition_string, "payload.bin"])
+    subprocess.run(["./tools/payload-dumper-go", "-c", "8", "-o","./", "-p", partition_string, "payload.bin"])
 
 
 def extract_files():
     try:
         # 提取镜像文件中的文件
         for image in partitions:
-            subprocess.run(["./extract.erofs", "-i", image + ".img", "-x", "-T8"])
+            subprocess.run(["./tools/extract.erofs", "-i", image + ".img", "-x", "-T8"])
         
         # 搜索当前目录及其子目录中的 build.prop 文件 
         with open("./product/etc/build.prop", "r") as file:

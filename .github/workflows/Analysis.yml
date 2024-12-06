@@ -34,8 +34,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - name: Download Repo
+      uses: robinraju/release-downloader@v1.10
+      with:
+        repository: "Analysis-Tool-For-HyperOS"
+        latest: true
+        extract: true
+        fileName: "Analysis-Tool-For-HyperOS-Linux-x86_64.zip"
     
     - name: Install dependence
       run: |
@@ -44,8 +49,8 @@ jobs:
 
     - name: Set permission
       run: |
-       chmod +x ./tools/Linux/x86_64/extract.erofs
-       chmod +x ./tools/Linux/x86_64/payload-dumper-go
+       chmod +x ./tools/extract.erofs
+       chmod +x ./tools/payload-dumper-go
 
     - name: Download ROM
       run: |
