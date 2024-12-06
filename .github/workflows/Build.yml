@@ -50,11 +50,11 @@ jobs:
         run: |
           sanitized_ref=$(echo "${GITHUB_REF}" | sed 's/refs\/tags\///g')
           mkdir -p ./output
-          mkdir -p "./Windows-${sanitized_ref}-x86_64"
-          mkdir -p "./Linux-${sanitized_ref}-arm64"
-          mkdir -p "./Linux-${sanitized_ref}-x86_64"
-          mkdir -p "./Darwin-${sanitized_ref}-arm64"
-          mkdir -p "./Darwin-${sanitized_ref}-x86_64"
+          mkdir -p "./Windows-${sanitized_ref}-x86_64/tools"
+          mkdir -p "./Linux-${sanitized_ref}-arm64/tools"
+          mkdir -p "./Linux-${sanitized_ref}-x86_64/tools"
+          mkdir -p "./Darwin-${sanitized_ref}-arm64/tools"
+          mkdir -p "./Darwin-${sanitized_ref}-x86_64/tools"
           
           # 递归复制目录
           cp -r ./repo/* "./Windows-${sanitized_ref}-x86_64/"
@@ -82,14 +82,14 @@ jobs:
           for file in *; do
                 case "$file" in
                   *.zip)
-                    unzip -j "$file" "extract.erofs" -d "./Linux-${sanitized_ref}-x86_64/"
+                    unzip -j "$file" "extract.erofs" -d "./Linux-${sanitized_ref}-x86_64/tools"
                     ;;
                   *.tar.gz)
-                    tar -xvzf "$file" "payload-dumper-go" -C "./Linux-${sanitized_ref}-x86_64/"
+                    tar -xvzf "$file" "payload-dumper-go" -C "./Linux-${sanitized_ref}-x86_64/tools"
                     ;;
                 esac
           done
-          zip -r "./Linux-${sanitized_ref}-x86_64.zip" "./Linux-${sanitized_ref}-x86_64/tool/"
+          zip -r "./Linux-${sanitized_ref}-x86_64.zip" "./Linux-${sanitized_ref}-x86_64/
           mv "./Linux-${sanitized_ref}-x86_64.zip" output/
 
       - name: Release
