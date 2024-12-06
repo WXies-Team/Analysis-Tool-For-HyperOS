@@ -99,4 +99,4 @@ jobs:
         with:
           body_path: './release.md'
           files: ./output/*
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
