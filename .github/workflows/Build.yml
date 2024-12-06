@@ -85,7 +85,7 @@ jobs:
                 unzip -j "$file" "extract.erofs" -d "./Linux-x86_64/tools"
                 ;;
               *.tar.gz)
-                tar -xvzf "$file" -C "./Linux-x86_64/tools"
+                tar -xvzf "$file" "payload-dumper-go" -C "./Linux-x86_64/tools"
                 ;;
             esac
           done
