@@ -98,7 +98,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifact-file1
-          path: ./Darwin-arm64/
+          path: ./Linux-x86_64/*
 
       - name: Download payload-dumper-go-Linux-arm64
         uses: robinraju/release-downloader@v1.10
@@ -136,7 +136,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifact-file1
-          path: ./Darwin-arm64/
+          path: ./Linux-arm64/*
           
       - name: Download payload-dumper-go-Windows-x86_64
         uses: robinraju/release-downloader@v1.10
@@ -175,7 +175,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifact-file1
-          path: ./Darwin-arm64/
+          path: ./Windows-x86_64/*
 
       - name: Download payload-dumper-go-Darwin-x86_64
         uses: robinraju/release-downloader@v1.10
@@ -213,7 +213,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifact-file1
-          path: ./Darwin-arm64/
+          path: ./Darwin-x86_64/*
 
       - name: Download payload-dumper-go-Darwin-arm64
         uses: robinraju/release-downloader@v1.10
