@@ -67,9 +67,9 @@ jobs:
           fileName: "payload-dumper-go_*_linux_amd64.tar.gz"
 
       - name: Download
-        uses: sekaiacg/erofs-utils
+        uses: robinraju/release-downloader@v1.10
         with:
-          repository: "ssut/payload-dumper-go"
+          repository: "sekaiacg/erofs-utils"
           latest: true
           fileName: "erofs-utils-*-Linux_x86_64-*.zip"
 
