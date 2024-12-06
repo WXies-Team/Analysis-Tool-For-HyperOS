@@ -43,21 +43,22 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          path: 'repo' 
 
       - name: Process
         run:
-          mkdir ../output
-          mkdir ../Windows-${GITHUB_REF}-x86_64
-          mkdir ../Linux-${GITHUB_REF}-arm64
-          mkdir ../Linux-${GITHUB_REF}-x86_64
-          mkdir ../Darwin-${GITHUB_REF}-arm64
-          mkdir ..//Darwin-${GITHUB_REF}-x86_64
-          cp * ../Windows-${GITHUB_REF}-x86_64
-          cp * ../Linux-${GITHUB_REF}-arm64
-          cp * ../Linux-${GITHUB_REF}-x86_64
-          cp * ../Darwin-${GITHUB_REF}-arm64
-          cp * ../Darwin-${GITHUB_REF}-x86_64
-          cd ../
+          mkdir ./output
+          mkdir ./Windows-${GITHUB_REF}-x86_64
+          mkdir ./Linux-${GITHUB_REF}-arm64
+          mkdir ./Linux-${GITHUB_REF}-x86_64
+          mkdir ./Darwin-${GITHUB_REF}-arm64
+          mkdir .//Darwin-${GITHUB_REF}-x86_64
+          cp ./repo/* ./Windows-${GITHUB_REF}-x86_64
+          cp ./repo/* ./Linux-${GITHUB_REF}-arm64
+          cp ./repo/* ./Linux-${GITHUB_REF}-x86_64
+          cp ./repo/* ./Darwin-${GITHUB_REF}-arm64
+          cp ./repo/* ./Darwin-${GITHUB_REF}-x86_64
 
       - name: Download
         uses: robinraju/release-downloader@v1.10
@@ -85,7 +86,7 @@ jobs:
                     ;;
                 esac
               done
-          zip -r Linux-${GITHUB_REF}-x86_64.zip Linux-${GITHUB_REF}-x86_64/
+          zip -r Linux-${GITHUB_REF}-x86_64.zip Linux-${GITHUB_REF}-x86_64/tool/
           mv Linux-${GITHUB_REF}-x86_64.zip output/
 
       - name: Release
