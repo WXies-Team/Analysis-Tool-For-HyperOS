@@ -55,11 +55,13 @@ jobs:
           mkdir -p "./Linux-${sanitized_ref}-x86_64"
           mkdir -p "./Darwin-${sanitized_ref}-arm64"
           mkdir -p "./Darwin-${sanitized_ref}-x86_64"
-          cp ./repo/* "./Windows-${sanitized_ref}-x86_64/"
-          cp ./repo/* "./Linux-${sanitized_ref}-arm64/"
-          cp ./repo/* "./Linux-${sanitized_ref}-x86_64/"
-          cp ./repo/* "./Darwin-${sanitized_ref}-arm64/"
-          cp ./repo/* "./Darwin-${sanitized_ref}-x86_64/"
+          
+          # 递归复制目录
+          cp -r ./repo/* "./Windows-${sanitized_ref}-x86_64/"
+          cp -r ./repo/* "./Linux-${sanitized_ref}-arm64/"
+          cp -r ./repo/* "./Linux-${sanitized_ref}-x86_64/"
+          cp -r ./repo/* "./Darwin-${sanitized_ref}-arm64/"
+          cp -r ./repo/* "./Darwin-${sanitized_ref}-x86_64/"
 
       - name: Download payload dumper go
         uses: robinraju/release-downloader@v1.10
