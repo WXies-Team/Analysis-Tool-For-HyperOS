@@ -50,18 +50,18 @@ jobs:
         run: |
           sanitized_ref=$(echo "${GITHUB_REF}" | sed 's/refs\/tags\///g')
           mkdir -p ./output
-          mkdir -p "./Windows-${sanitized_ref}-x86_64/tools"
-          mkdir -p "./Linux-${sanitized_ref}-arm64/tools"
-          mkdir -p "./Linux-${sanitized_ref}-x86_64/tools"
-          mkdir -p "./Darwin-${sanitized_ref}-arm64/tools"
-          mkdir -p "./Darwin-${sanitized_ref}-x86_64/tools"
+          mkdir -p "./Windows-x86_64/tools"
+          mkdir -p "./Linux-arm64/tools"
+          mkdir -p "./Linux-x86_64/tools"
+          mkdir -p "./Darwin-arm64/tools"
+          mkdir -p "./Darwin-x86_64/tools"
           
           # 递归复制目录
-          cp -r ./repo/* "./Windows-${sanitized_ref}-x86_64/"
-          cp -r ./repo/* "./Linux-${sanitized_ref}-arm64/"
-          cp -r ./repo/* "./Linux-${sanitized_ref}-x86_64/"
-          cp -r ./repo/* "./Darwin-${sanitized_ref}-arm64/"
-          cp -r ./repo/* "./Darwin-${sanitized_ref}-x86_64/"
+          cp -r ./repo/* "./Windows-x86_64/"
+          cp -r ./repo/* "./Linux-arm64/"
+          cp -r ./repo/* "./Linux-x86_64/"
+          cp -r ./repo/* "./Darwin-arm64/"
+          cp -r ./repo/* "./Darwin-x86_64/"
 
       - name: Download payload dumper go
         uses: robinraju/release-downloader@v1.10
@@ -82,15 +82,15 @@ jobs:
           for file in *; do
                 case "$file" in
                   *.zip)
-                    unzip -j "$file" "extract.erofs" -d "./Linux-${sanitized_ref}-x86_64/tools"
+                    unzip -j "$file" "extract.erofs" -d "./Linux-x86_64/tools"
                     ;;
                   *.tar.gz)
-                    tar -xvzf "$file" "payload-dumper-go" -C "./Linux-${sanitized_ref}-x86_64/tools"
+                    tar -xvzf "$file" "payload-dumper-go" -C "./Linux-x86_64/tools"
                     ;;
                 esac
           done
-          zip -r "./Linux-${sanitized_ref}-x86_64.zip" "./Linux-${sanitized_ref}-x86_64/
-          mv "./Linux-${sanitized_ref}-x86_64.zip" output/
+          zip -r "./Linux-x86_64.zip" "./Linux-x86_64/
+          mv "./Linux-x86_64.zip" output/
 
       - name: Release
         if: ${{ !contains(github.ref, 'beta') }}
