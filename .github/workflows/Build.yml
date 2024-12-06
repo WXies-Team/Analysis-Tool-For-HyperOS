@@ -131,7 +131,7 @@ jobs:
         with:
           repository: "ssut/payload-dumper-go"
           latest: true
-          fileName: "payload-dumper-go_*_Windows_amd64.tar.gz"
+          fileName: "payload-dumper-go_*_windows_amd64.tar.gz"
 
       - name: Download erofs-utils-Windows-x86_64
         uses: robinraju/release-downloader@v1.10
