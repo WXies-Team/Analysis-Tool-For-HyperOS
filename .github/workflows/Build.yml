@@ -1,0 +1,96 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release-notes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate release.md
+        run: |
+          tags=($(git tag --merged $(git rev-parse HEAD) --sort=-creatordate))
+          preTag=$(curl --silent "https://api.github.com/repos/WXies-Team/Analysis-Tool-For-HyperOS/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")' || echo "")
+          currentTag=""
+          for ((i = 0; i <= ${#tags[@]}; i++)); do
+            if (( i < ${#tags[@]} )); then
+              tag=${tags[$i]}
+            else
+              tag=""
+            fi
+            if [ -n "$currentTag" ]; then
+              if [ "$(echo -e "$currentTag\n$preTag" | sort -V | head -n 1)" == "$currentTag" ]; then
+                break
+              fi
+            fi
+            if [ -n "$currentTag" ]; then
+              if [ -n "$tag" ]; then
+                git log --pretty=format:"%B" "$tag..$currentTag" | awk 'NF {print "- " $0} !NF {print ""}' >> release.md
+              else
+                git log --pretty=format:"%B" "$currentTag" | awk 'NF {print "- " $0} !NF {print ""}' >> release.md
+              fi
+              echo "" >> release.md
+            fi
+            currentTag=$tag
+          done
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Process
+        run:
+          mkdir ../output
+          mkdir ../Windows-${GITHUB_REF}-x86_64
+          mkdir ../Linux-${GITHUB_REF}-arm64
+          mkdir ../Linux-${GITHUB_REF}-x86_64
+          mkdir ../Darwin-${GITHUB_REF}-arm64
+          mkdir ..//Darwin-${GITHUB_REF}-x86_64
+          cp * ../Windows-${GITHUB_REF}-x86_64
+          cp * ../Linux-${GITHUB_REF}-arm64
+          cp * ../Linux-${GITHUB_REF}-x86_64
+          cp * ../Darwin-${GITHUB_REF}-arm64
+          cp * ../Darwin-${GITHUB_REF}-x86_64
+          cd ../
+
+      - name: Download
+        uses: robinraju/release-downloader@v1.10
+        with:
+          repository: "ssut/payload-dumper-go"
+          latest: true
+          fileName: "payload-dumper-go_*_linux_amd64.tar.gz"
+
+      - name: Download
+        uses: sekaiacg/erofs-utils
+        with:
+          repository: "ssut/payload-dumper-go"
+          latest: true
+          fileName: "erofs-utils-*-Linux_x86_64-*.zip"
+
+      - name: unzipx86
+        run:
+          for file in *; do
+                case "$file" in
+                  *.zip)
+                    unzip -j "$file" "extract.erofs" -d /Linux-${GITHUB_REF}-x86_64/
+                    ;;
+                  *.tar.gz)
+                    tar -xvzf "$file" "payload-dumper-go" -C /Linux-${GITHUB_REF}-x86_64/
+                    ;;
+                esac
+              done
+          zip -r Linux-${GITHUB_REF}-x86_64.zip Linux-${GITHUB_REF}-x86_64/
+          mv Linux-${GITHUB_REF}-x86_64.zip output/
+
+      - name: Release
+        if: ${{ !contains(github.ref, 'beta') }}
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: './release.md'
+          files: ./output/*
