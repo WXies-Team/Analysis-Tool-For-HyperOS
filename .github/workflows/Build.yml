@@ -223,12 +223,14 @@ jobs:
           rm ./*.zip
           rm ./*.tar.gz
 
-      - name: Download
-        uses: actions/download-artifact@v4
-        with:
-          path: ./output/
-          pattern: artifact-*
-          merge-multiple: true
+      - name: Upload multiple artifacts
+        run: |
+          for file in ./output/*; do
+            filename=$(basename "$file")
+            echo "Uploading $filename as an artifact"
+            curl -X POST --url https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts --header "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -F "name=$filename" -F "file=@$file"
+          done
+        
 
       - name: Release
         if: ${{ !contains(github.ref, 'beta') }}
