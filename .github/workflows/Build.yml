@@ -41,53 +41,54 @@ jobs:
             currentTag=$tag
           done
 
-      - name: Checkout code
+      - name: Checkout code into separate directory
         uses: actions/checkout@v4
         with:
-          path: 'repo' 
+          path: 'repo'
 
       - name: Process
-        run:
-          mkdir ./output
-          mkdir ./Windows-${GITHUB_REF}-x86_64
-          mkdir ./Linux-${GITHUB_REF}-arm64
-          mkdir ./Linux-${GITHUB_REF}-x86_64
-          mkdir ./Darwin-${GITHUB_REF}-arm64
-          mkdir .//Darwin-${GITHUB_REF}-x86_64
-          cp ./repo/* ./Windows-${GITHUB_REF}-x86_64
-          cp ./repo/* ./Linux-${GITHUB_REF}-arm64
-          cp ./repo/* ./Linux-${GITHUB_REF}-x86_64
-          cp ./repo/* ./Darwin-${GITHUB_REF}-arm64
-          cp ./repo/* ./Darwin-${GITHUB_REF}-x86_64
+        run: |
+          sanitized_ref=$(echo "${GITHUB_REF}" | sed 's/refs\/tags\///g')
+          mkdir -p ./output
+          mkdir -p "./Windows-${sanitized_ref}-x86_64"
+          mkdir -p "./Linux-${sanitized_ref}-arm64"
+          mkdir -p "./Linux-${sanitized_ref}-x86_64"
+          mkdir -p "./Darwin-${sanitized_ref}-arm64"
+          mkdir -p "./Darwin-${sanitized_ref}-x86_64"
+          cp ./repo/* "./Windows-${sanitized_ref}-x86_64/"
+          cp ./repo/* "./Linux-${sanitized_ref}-arm64/"
+          cp ./repo/* "./Linux-${sanitized_ref}-x86_64/"
+          cp ./repo/* "./Darwin-${sanitized_ref}-arm64/"
+          cp ./repo/* "./Darwin-${sanitized_ref}-x86_64/"
 
-      - name: Download
+      - name: Download payload dumper go
         uses: robinraju/release-downloader@v1.10
         with:
           repository: "ssut/payload-dumper-go"
           latest: true
           fileName: "payload-dumper-go_*_linux_amd64.tar.gz"
 
-      - name: Download
+      - name: Download erofs-utils
         uses: robinraju/release-downloader@v1.10
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
           fileName: "erofs-utils-*-Linux_x86_64-*.zip"
 
-      - name: unzipx86
-        run:
+      - name: Unzip and extract files
+        run: |
           for file in *; do
                 case "$file" in
                   *.zip)
-                    unzip -j "$file" "extract.erofs" -d /Linux-${GITHUB_REF}-x86_64/
+                    unzip -j "$file" "extract.erofs" -d "./Linux-${sanitized_ref}-x86_64/"
                     ;;
                   *.tar.gz)
-                    tar -xvzf "$file" "payload-dumper-go" -C /Linux-${GITHUB_REF}-x86_64/
+                    tar -xvzf "$file" "payload-dumper-go" -C "./Linux-${sanitized_ref}-x86_64/"
                     ;;
                 esac
-              done
-          zip -r Linux-${GITHUB_REF}-x86_64.zip Linux-${GITHUB_REF}-x86_64/tool/
-          mv Linux-${GITHUB_REF}-x86_64.zip output/
+          done
+          zip -r "./Linux-${sanitized_ref}-x86_64.zip" "./Linux-${sanitized_ref}-x86_64/tool/"
+          mv "./Linux-${sanitized_ref}-x86_64.zip" output/
 
       - name: Release
         if: ${{ !contains(github.ref, 'beta') }}
