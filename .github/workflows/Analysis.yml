@@ -60,7 +60,10 @@ jobs:
         
     - name: Install dependence
       run: |
-        cd ./Analysis-Tool-For-HyperOS-Linux-x86_64
+        mkdir tools
+        mv extract.erofs tools/
+        mv payload-dumper-go tools/
+
         sudo apt-get install -y android-sdk-build-tools
         pip install -r requirements.txt
 
