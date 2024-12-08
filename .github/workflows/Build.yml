@@ -101,6 +101,7 @@ jobs:
       - name: Upload action
         uses: actions/upload-artifact@v4
         with:
+          name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64.zip
           path: ./output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64.zip
 
       - name: Download payload-dumper-go-Linux-arm64
