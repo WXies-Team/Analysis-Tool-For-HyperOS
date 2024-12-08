@@ -433,33 +433,6 @@ def delete_files_and_folders():
             print(f"{folder} 不存在")
 
 
-def git_push():
-    device_name = input("机型：")
-    os_version = input("版本号：")
-    commit_text = "feat: update"
-    commit = f"{commit_text} {device_name} {os_version}"
-    try:
-        with open(JSON_V, "r") as file:
-            line = file.readline()
-            if line == "Phone":
-                move_json(1, "ph")
-                subprocess.run(["git", "add", "phone/"]) 
-            elif line == "Pad":
-                move_json(1, "p")
-                subprocess.run(["git", "add", "pad/"]) 
-            elif line == "Fold":
-                move_json(1, "f")
-                subprocess.run(["git", "add", "fold/"]) 
-            elif line == "Flip":
-                move_json(1,"fp")
-                subprocess.run(["git"],"add","flip/")
-            else:
-                print("未检测到字库，无法上传")
-    except Exception as e:
-        print(f"异常，报错信息: {e}")
-    subprocess.run(["git", "commit","-m",commit]) 
-    subprocess.run(["git", "push"]) 
-
 def get_info():
     try:
         with open("./product/etc/build.prop", "r") as file:

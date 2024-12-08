@@ -36,7 +36,7 @@
 3. 运行脚本：
 
    ```
-   python main.py [-h] [-d URL] [-p] [-i] [-f] [-t] [-a] [-n] [-u] [-m] [-c] [-g] [-o]
+   python main.py [-h] [-d URL] [-p] [-i] [-f] [-t] [-a] [-n] [-u] [-m] [-c] [-o]
    ```
 
 按照提示选择相应的操作。
@@ -55,6 +55,5 @@
     -u, --update-version  更新 APK 版本
     -m, --update-name     更新 APK 名称
     -c, --clean           删除不需要的文件和文件夹
-    -g, --git-push        上传数据库到仓库
     -o, --get-info        获取包信息
 ```
