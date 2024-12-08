@@ -60,7 +60,7 @@
   "com.miui.notification": "通知管理",
   "com.miui.packageinstaller": "应用包管理组件Pad",
   "com.miui.personalassistant": "智能助理Pad",
-  "com.miui.phrase": "常用语",
+  "com.miui.phrase": "剪贴板与常用语",
   "com.miui.player": "音乐Pad",
   "com.miui.screenrecorder": "屏幕录制",
   "com.miui.screenshot": "截屏",
@@ -89,7 +89,7 @@
   "com.xiaomi.aireco": "小爱建议",
   "com.xiaomi.aiasst.service": "小爱通话",
   "com.xiaomi.aiasst.vision": "小爱翻译",
-  "com.xiaomi.aicr": "MiAI引擎",
+  "com.xiaomi.aicr": "小米澎湃AI引擎",
   "com.xiaomi.aon": "MiAonService",
   "com.xiaomi.barrage": "弹幕通知",
   "com.xiaomi.cajlauncher": "CAJViewer(Linux)",
@@ -121,5 +121,6 @@
   "com.xiaomi.xmsf": "小米服务框架",
   "com.mi.android.globallauncher": "POCO桌面",
   "com.xiaomi.kidspace": "小米教育中心",
+  "com.miui.voiceassist": "小爱同学",
   "miui.systemui.plugin": "系统界面组件"
 }
