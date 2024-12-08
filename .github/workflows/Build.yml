@@ -54,17 +54,17 @@ jobs:
       - name: Process
         run: |
           mkdir -p ./output
-          mkdir -p "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64/tools"
-          mkdir -p "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-arm64/tools"
-          mkdir -p "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64/tools"
-          mkdir -p "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-arm64/tools"
-          mkdir -p "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64/tools"
+          mkdir -p "./Analysis-Tool-For-HyperOS-Windows-x86_64/tools"
+          mkdir -p "./Analysis-Tool-For-HyperOS-Linux-arm64/tools"
+          mkdir -p "./Analysis-Tool-For-HyperOS-Linux-x86_64/tools"
+          mkdir -p "./Analysis-Tool-For-HyperOS-Darwin-arm64/tools"
+          mkdir -p "./Analysis-Tool-For-HyperOS-Darwin-x86_64/tools"
           
-          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64/"
-          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-arm64/"
-          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64/"
-          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-arm64/"
-          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64/"
+          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Windows-x86_64/"
+          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Linux-arm64/"
+          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Linux-x86_64/"
+          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Darwin-arm64/"
+          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Darwin-x86_64/"
 
       - name: Download payload-dumper-go-Linux-x86_64
         uses: robinraju/release-downloader@v1.10
@@ -85,15 +85,15 @@ jobs:
           for file in *; do
             case "$file" in
               *.zip)
-                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64/tools"
+                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-Linux-x86_64/tools"
                 ;;
               *.tar.gz)
-                tar -xzv -C "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64/tools" -f "$file" "payload-dumper-go"
+                tar -xzv -C "./Analysis-Tool-For-HyperOS-Linux-x86_64/tools" -f "$file" "payload-dumper-go"
                 ;;
             esac
           done
 
-          7z a "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64.zip" "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64/*"
+          7z a "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64.zip" "./Analysis-Tool-For-HyperOS-Linux-x86_64/*"
           mv "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64.zip" output/
           rm ./*.zip
           rm ./*.tar.gz
@@ -101,8 +101,7 @@ jobs:
       - name: Upload action
         uses: actions/upload-artifact@v4
         with:
-          name: Analysis-Tool-For-HyperOS-${{ steps.get_version.outputs.VERSION }}-Linux-x86_64
-          path: ./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64/*
+          path: ./Analysis-Tool-For-${{ env.VERSION }}-HyperOS-Linux-x86_64/*
 
       - name: Download payload-dumper-go-Linux-arm64
         uses: robinraju/release-downloader@v1.10
@@ -123,15 +122,15 @@ jobs:
           for file in *; do
             case "$file" in
               *.zip)
-                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-arm64/tools"
+                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-Linux-arm64/tools"
                 ;;
               *.tar.gz)
-                tar -xzv -C "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-arm64/tools" -f "$file" "payload-dumper-go"
+                tar -xzv -C "./Analysis-Tool-For-HyperOS-Linux-arm64/tools" -f "$file" "payload-dumper-go"
                 ;;
             esac
           done
 
-          7z a  "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-arm64.zip" "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-arm64/*"
+          7z a "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-arm64.zip" "./Analysis-Tool-For-HyperOS-Linux-arm64/*"
           mv "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-arm64.zip" output/
           rm ./*.zip
           rm ./*.tar.gz
@@ -139,8 +138,7 @@ jobs:
       - name: Upload action
         uses: actions/upload-artifact@v4
         with:
-          name: Analysis-Tool-For-HyperOS-Linux-arm64
-          path: ./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-arm64/*
+          path: ./Analysis-Tool-${{ env.VERSION }}-For-HyperOS-Linux-arm64/*
           
       - name: Download payload-dumper-go-Windows-x86_64
         uses: robinraju/release-downloader@v1.10
@@ -161,25 +159,24 @@ jobs:
           for file in *; do
             case "$file" in
               *.zip)
-                unzip -j "$file" "cygwin1.dll" -d "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64/tools"
-                unzip -j "$file" "extract.erofs.exe" -d "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64/tools"
+                unzip -j "$file" "cygwin1.dll" -d "./Analysis-Tool-For-HyperOS-Windows-x86_64/tools"
+                unzip -j "$file" "extract.erofs.exe" -d "./Analysis-Tool-For-HyperOS-Windows-x86_64/tools"
                 ;;
               *.tar.gz)
-                tar -xzv -C "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64/tools" -f "$file" "payload-dumper-go.exe"
+                tar -xzv -C "./Analysis-Tool-For-HyperOS-Windows-x86_64/tools" -f "$file" "payload-dumper-go.exe"
                 ;;
             esac
           done
 
-          7z a  "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64" "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64/*"
-          mv "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64.zip" output/
+          7z a "./Analysis-Tool-For-${{ env.VERSION }}-HyperOS-Windows-x86_64" "./Analysis-Tool-For-HyperOS-Windows-x86_64/*"
+          mv "./Analysis-Tool-For-${{ env.VERSION }}-HyperOS-Windows-x86_64.zip" output/
           rm ./*.zip
           rm ./*.tar.gz
 
       - name: Upload action
         uses: actions/upload-artifact@v4
         with:
-          name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64
-          path: ./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64/*
+          path: ./Analysis-Tool-For-${{ env.VERSION }}-HyperOS-Windows-x86_64/*
 
       - name: Download payload-dumper-go-Darwin-x86_64
         uses: robinraju/release-downloader@v1.10
@@ -200,15 +197,15 @@ jobs:
           for file in *; do
             case "$file" in
               *.zip)
-                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64/tools"
+                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-Darwin-x86_64/tools"
                 ;;
               *.tar.gz)
-                tar -xzv -C "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64/tools" -f "$file" "payload-dumper-go"
+                tar -xzv -C "./Analysis-Tool-For-HyperOS-Darwin-x86_64/tools" -f "$file" "payload-dumper-go"
                 ;;
             esac
           done
 
-          7z a  "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64" "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64/*"
+          7z a "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64" "./Analysis-Tool-For-HyperOS-Darwin-x86_64/*"
           mv "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64.zip" output/
           rm ./*.zip
           rm ./*.tar.gz
@@ -216,8 +213,7 @@ jobs:
       - name: Upload action
         uses: actions/upload-artifact@v4
         with:
-          name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64
-          path: ./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64/*
+          path: ./Analysis-Tool-For-${{ env.VERSION }}-HyperOS-Darwin-x86_64/*
 
       - name: Download payload-dumper-go-Darwin-arm64
         uses: robinraju/release-downloader@v1.10
@@ -238,24 +234,23 @@ jobs:
           for file in *; do
             case "$file" in
               *.zip)
-                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-arm64/tools"
+                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-Darwin-arm64/tools"
                 ;;
               *.tar.gz)
-                tar -xzv -C "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-arm64/tools" -f "$file" "payload-dumper-go"
+                tar -xzv -C "./Analysis-Tool-For-HyperOS-Darwin-arm64/tools" -f "$file" "payload-dumper-go"
                 ;;
             esac
           done
 
-          7z a  "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-arm64" "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-arm64/*"
-          mv "./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-arm64.zip" output/
+          7z a "./Analysis-Tool-For-${{ env.VERSION }}-HyperOS-Darwin-arm64" "./Analysis-Tool-For-HyperOS-Darwin-arm64/*"
+          mv "./Analysis-Tool-For-${{ env.VERSION }}-HyperOS-Darwin-arm64.zip" output/
           rm ./*.zip
           rm ./*.tar.gz
 
       - name: Upload action
         uses: actions/upload-artifact@v4
         with:
-          name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-arm64
-          path: ./Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-arm64/
+          path: ./Analysis-Tool-For-${{ env.VERSION }}-HyperOS-Darwin-arm64/
 
       - name: Release
         if: ${{ !contains(github.ref, 'beta') }}
