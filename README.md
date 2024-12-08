@@ -17,7 +17,15 @@
 
 ## 如何使用
 
-1. 在 [Release](https://github.com/WXies-Team/Analysis-Tool-For-ColorOS/releases/latest) 内下载压缩包（测试版在 [Action](https://github.com/WXies-Team/Analysis-Tool-For-HyperOS/actions/workflows/Build.yml) 内）：
+1. 通过以下地址下载：
+
+   | 类型   | 源   | 地址           |
+   | :-: | :-: | :-: |
+   | 正式版 | 国外 | [GitHub Release](https://github.com/WXies-Team/Analysis-Tool-For-HyperOS/releases) |
+   | 正式版 | 国内 | [Drive Center](https://drive.horatio.cn/Release/Analysis-Tool-For-HyperOS) |
+   | 测试版 | 国外 | [GitHub Actions](https://github.com/WXies-Team/Analysis-Tool-For-HyperOS/actions) |
+
+   
 
 2. 确保已安装 Python 3.x, aria2c, 7zip 并安装依赖库：
 
