@@ -100,7 +100,7 @@ jobs:
       - name: Upload action
         uses: actions/upload-artifact@v4
         with:
-          name: Analysis-Tool-For-HyperOS-Linux-x86_64
+          name: Analysis-Tool-For-HyperOS-${{ steps.get_version.outputs.VERSION }}-Linux-x86_64
           path: ./Analysis-Tool-For-HyperOS-Linux-x86_64/*
 
       - name: Download payload-dumper-go-Linux-arm64
