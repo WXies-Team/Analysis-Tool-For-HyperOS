@@ -53,7 +53,15 @@ jobs:
 
       - name: Process
         run: |
-          mkdir -p ./output "./Analysis-Tool-For-HyperOS-{Windows-x86_64,Linux-arm64,Linux-x86_64,Darwin-arm64,Darwin-x86_64,Android-arm64,Android-x86_64,WSL-x86_64}/tools"
+          mkdir -p ./output
+          mkdir -p "./Analysis-Tool-For-HyperOS-Windows-x86_64/tools"
+          mkdir -p "./Analysis-Tool-For-HyperOS-Linux-arm64/tools"
+          mkdir -p "./Analysis-Tool-For-HyperOS-Linux-x86_64/tools"
+          mkdir -p "./Analysis-Tool-For-HyperOS-Darwin-arm64/tools"
+          mkdir -p "./Analysis-Tool-For-HyperOS-Darwin-x86_64/tools"
+          mkdir -p "./Analysis-Tool-For-HyperOS-Android-arm64/tools"
+          mkdir -p "./Analysis-Tool-For-HyperOS-Android-x86_64/tools"
+          mkdir -p "./Analysis-Tool-For-HyperOS-WSL-x86_64/tools"
           
           cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Windows-x86_64/"
           cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Linux-arm64/"
@@ -94,7 +102,7 @@ jobs:
           rm ./*.zip
           rm ./*.tar.gz
 
-      - name: Upload action
+      - name: Upload artifact-Linux-x86_64
         uses: actions/upload-artifact@v4
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64.zip
@@ -130,13 +138,13 @@ jobs:
           rm ./*.zip
           rm ./*.tar.gz
 
-      - name: Upload action
+      - name: Upload artifact-Linux-arm64
         uses: actions/upload-artifact@v4
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-arm64.zip
           path: ./Analysis-Tool-For-HyperOS-Linux-arm64/*
 
-      - name: Download payload-dumper-go-Windows-x86_64
+      - name: Download dependencies-Windows-x86_64
         uses: robinraju/release-downloader@v1.10
         with:
           repository: "ssut/payload-dumper-go"
@@ -167,13 +175,13 @@ jobs:
           rm ./*.zip
           rm ./*.tar.gz
 
-      - name: Upload action
+      - name: Upload artifact-Windows-x86_64
         uses: actions/upload-artifact@v4
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64.zip
           path: ./Analysis-Tool-For-HyperOS-Windows-x86_64/*
           
-      - name: Download dependencies-Darwin-x86_64
+      - name: Download payload-dumper-go-Darwin-x86_64
         uses: robinraju/release-downloader@v1.10
         with:
           repository: "ssut/payload-dumper-go"
@@ -203,13 +211,13 @@ jobs:
           rm ./*.zip
           rm ./*.tar.gz
 
-      - name: Upload action
+      - name: Upload artifact-Darwin-x86_64
         uses: actions/upload-artifact@v4
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64.zip
           path: ./Analysis-Tool-For-HyperOS-Darwin-x86_64/*
 
-      - name: Download dependencies-arm64
+      - name: Download payload-dumper-go-Darwin-arm64
         uses: robinraju/release-downloader@v1.10
         with:
           repository: "ssut/payload-dumper-go"
@@ -239,7 +247,7 @@ jobs:
           rm ./*.zip
           rm ./*.tar.gz
 
-      - name: Upload action
+      - name: Upload artifact-Darwin-arm64
         uses: actions/upload-artifact@v4
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-arm64.zip
@@ -275,13 +283,13 @@ jobs:
           rm ./*.zip
           rm ./*.tar.gz
 
-      - name: Upload action
+      - name: Upload artifact-Android-arm64
         uses: actions/upload-artifact@v4
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Android-arm64.zip
           path: ./Analysis-Tool-For-HyperOS-Android-arm64/*
 
-      - name: Download dependencies-Android-x86_64
+      - name: Download payload-dumper-go-Android-x86_64
         uses: robinraju/release-downloader@v1.10
         with:
           repository: "ssut/payload-dumper-go"
@@ -311,13 +319,13 @@ jobs:
           rm ./*.zip
           rm ./*.tar.gz
 
-      - name: Upload action
+      - name: Upload artifact-Android-x86_64
         uses: actions/upload-artifact@v4
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Android-x86_64.zip
           path: ./Analysis-Tool-For-HyperOS-Android-x86_64/*
 
-      - name: Download dependencies-WSL-x86_64
+      - name: Download payload-dumper-go-WSL-x86_64
         uses: robinraju/release-downloader@v1.10
         with:
           repository: "ssut/payload-dumper-go"
@@ -347,7 +355,7 @@ jobs:
           rm ./*.zip
           rm ./*.tar.gz
 
-      - name: Upload action
+      - name: Upload artifact-WSL-x86_64
         uses: actions/upload-artifact@v4
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-WSL-x86_64.zip
