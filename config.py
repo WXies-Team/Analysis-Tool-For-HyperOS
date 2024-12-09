@@ -65,7 +65,9 @@ is_pad = [
           "xun", 
           "sheng", 
           "dizi", 
-          "ruan"
+          "ruan",
+          "uke",
+          "muyu"
          ]
 is_flip = [
            "ruyi"
