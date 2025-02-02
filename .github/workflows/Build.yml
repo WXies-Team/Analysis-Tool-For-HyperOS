@@ -55,10 +55,59 @@ jobs:
           { os: Android, arch: x86_64, dep_os: linux, erofs_suffix: Android_x86_64 },
           { os: WSL, arch: x86_64, dep_os: linux, erofs_suffix: WSL_x86_64 }
         ]
-    
     steps:
-      # [保持原有build job步骤不变，此处省略重复内容]
-      # 包含：目录准备、依赖下载、文件处理、打包上传等步骤
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Prepare directory
+        run: |
+          dir_name="Analysis-Tool-For-HyperOS-${{ matrix.platform.os }}-${{ matrix.platform.arch }}"
+          mkdir -p "./$dir_name/tools"
+          cp -r ./* "./$dir_name/" || true
+
+      - name: Download dependencies
+        uses: robinraju/release-downloader@v1.10
+        with:
+          repository: "ssut/payload-dumper-go"
+          latest: true
+          fileName: "payload-dumper-go_*_${{ matrix.platform.dep_os }}_${{ matrix.platform.arch }}.tar.gz"
+      
+      - name: Download erofs-utils
+        uses: robinraju/release-downloader@v1.10
+        with:
+          repository: "sekaiacg/erofs-utils"
+          latest: true
+          fileName: "erofs-utils-*-${{ matrix.platform.erofs_suffix }}-*.zip"
+
+      - name: Process dependencies
+        run: |
+          dir_name="Analysis-Tool-For-HyperOS-${{ matrix.platform.os }}-${{ matrix.platform.arch }}"
+          
+          for file in *; do
+            case "$file" in
+              *.zip)
+                unzip -j "$file" "extract.erofs*" -d "./$dir_name/tools"
+                [ -n "${{ matrix.platform.extra_files }}" ] && unzip -j "$file" "${{ matrix.platform.extra_files }}" -d "./$dir_name/tools"
+                ;;
+              *.tar.gz)
+                tar -xzv -C "./$dir_name/tools" -f "$file" --wildcards "payload-dumper-go*"
+                ;;
+            esac
+          done
+
+      - name: Package artifacts
+        run: |
+          dir_name="Analysis-Tool-For-HyperOS-${{ matrix.platform.os }}-${{ matrix.platform.arch }}"
+          7z a "./$dir_name.zip" "./$dir_name/*"
+          mkdir -p output
+          mv "$dir_name.zip" "output/Analysis-Tool-For-HyperOS-${{ needs.prepare.outputs.version }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.zip"
+          rm ./*.zip ./*.tar.gz
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Analysis-Tool-For-HyperOS-${{ needs.prepare.outputs.version }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.zip
+          path: ./output/*
 
   release:
     needs: [prepare, build]
