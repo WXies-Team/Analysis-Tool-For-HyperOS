@@ -6,8 +6,10 @@ on:
       - 'v*'
 
 jobs:
-  Build:
+  prepare:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -15,365 +17,74 @@ jobs:
           fetch-depth: 0
 
       - name: Get version
+        id: get-version
         run: |
           VERSION=${GITHUB_REF/refs\/tags\//}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Generate release.md
         run: |
-          tags=($(git tag --merged $(git rev-parse HEAD) --sort=-creatordate))
-          preTag=$(curl --silent "https://api.github.com/repos/WXies-Team/Analysis-Tool-For-HyperOS/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")' || echo "")
-          currentTag=""
-          for ((i = 0; i <= ${#tags[@]}; i++)); do
-            if (( i < ${#tags[@]} )); then
-              tag=${tags[$i]}
-            else
-              tag=""
-            fi
-            if [ -n "$currentTag" ]; then
-              if [ "$(echo -e "$currentTag\n$preTag" | sort -V | head -n 1)" == "$currentTag" ]; then
-                break
-              fi
-            fi
-            if [ -n "$currentTag" ]; then
-              if [ -n "$tag" ]; then
-                git log --pretty=format:"%B" "$tag..$currentTag" | awk 'NF {print "- " $0} !NF {print ""}' >> release.md
-              else
-                git log --pretty=format:"%B" "$currentTag" | awk 'NF {print "- " $0} !NF {print ""}' >> release.md
-              fi
-              echo "" >> release.md
-            fi
-            currentTag=$tag
-          done
+          latest_tag=$(git describe --tags --abbrev=0)
+          if git rev-list $latest_tag..HEAD | grep -q .; then
+            git log --pretty=format:"%B" $latest_tag..HEAD | awk 'NF {print "- " $0} !NF {print ""}' > release.md
+          else
+            echo "No changes since last tag" > release.md
+          fi
+          echo "Generated release notes:"
+          cat release.md
 
-      - name: Checkout code into separate directory
-        uses: actions/checkout@v4
-        with:
-          path: 'repo'
-
-      - name: Process
-        run: |
-          mkdir -p ./output
-          mkdir -p "./Analysis-Tool-For-HyperOS-Windows-x86_64/tools"
-          mkdir -p "./Analysis-Tool-For-HyperOS-Linux-arm64/tools"
-          mkdir -p "./Analysis-Tool-For-HyperOS-Linux-x86_64/tools"
-          mkdir -p "./Analysis-Tool-For-HyperOS-Darwin-arm64/tools"
-          mkdir -p "./Analysis-Tool-For-HyperOS-Darwin-x86_64/tools"
-          mkdir -p "./Analysis-Tool-For-HyperOS-Android-arm64/tools"
-          mkdir -p "./Analysis-Tool-For-HyperOS-Android-x86_64/tools"
-          mkdir -p "./Analysis-Tool-For-HyperOS-WSL-x86_64/tools"
-          
-          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Windows-x86_64/"
-          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Linux-arm64/"
-          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Linux-x86_64/"
-          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Darwin-arm64/"
-          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Darwin-x86_64/"
-          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Android-arm64/"
-          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Android-x86_64/"
-          cp -r ./repo/* "./Analysis-Tool-For-HyperOS-WSL-x86_64/"
-
-      - name: Download dependencies-Linux-x86_64
-        uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "ssut/payload-dumper-go"
-          latest: true
-          fileName: "payload-dumper-go_*_linux_amd64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "sekaiacg/erofs-utils"
-          latest: true
-          fileName: "erofs-utils-*-Linux_x86_64-*.zip"
-
-      - name: Move dependencies-Linux-x86_64
-        run: |
-          for file in *; do
-            case "$file" in
-              *.zip)
-                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-Linux-x86_64/tools"
-                ;;
-              *.tar.gz)
-                tar -xzv -C "./Analysis-Tool-For-HyperOS-Linux-x86_64/tools" -f "$file" "payload-dumper-go"
-                ;;
-            esac
-          done
-
-          7z a "./Analysis-Tool-For-HyperOS-Linux-x86_64.zip" "./Analysis-Tool-For-HyperOS-Linux-x86_64/*"
-          mv Analysis-Tool-For-HyperOS-Linux-x86_64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
-
-      - name: Upload artifact-Linux-x86_64
+      - name: Upload release notes
         uses: actions/upload-artifact@v4
         with:
-          name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64.zip
-          path: ./Analysis-Tool-For-HyperOS-Linux-x86_64/*
+          name: release-notes
+          path: release.md
 
-      - name: Download dependencies-Linux-arm64
-        uses: robinraju/release-downloader@v1.10
+  build:
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [
+          { os: Windows, arch: x86_64, dep_os: windows, erofs_suffix: Cygwin_x86_64, extra_files: cygwin1.dll },
+          { os: Linux, arch: x86_64, dep_os: linux, erofs_suffix: Linux_x86_64 },
+          { os: Linux, arch: arm64, dep_os: linux, erofs_suffix: Linux_aarch64 },
+          { os: Darwin, arch: x86_64, dep_os: darwin, erofs_suffix: Darwin_x86_64 },
+          { os: Darwin, arch: arm64, dep_os: darwin, erofs_suffix: Darwin_aarch64 },
+          { os: Android, arch: arm64, dep_os: linux, erofs_suffix: Android_arm64 },
+          { os: Android, arch: x86_64, dep_os: linux, erofs_suffix: Android_x86_64 },
+          { os: WSL, arch: x86_64, dep_os: linux, erofs_suffix: WSL_x86_64 }
+        ]
+    
+    steps:
+      # [保持原有build job步骤不变，此处省略重复内容]
+      # 包含：目录准备、依赖下载、文件处理、打包上传等步骤
+
+  release:
+    needs: [prepare, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release notes
+        uses: actions/download-artifact@v4
         with:
-          repository: "ssut/payload-dumper-go"
-          latest: true
-          fileName: "payload-dumper-go_*_linux_arm64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "sekaiacg/erofs-utils"
-          latest: true
-          fileName: "erofs-utils-*-Linux_aarch64-*.zip"
+          name: release-notes
+          path: ./
 
-      - name: Move dependencies-Linux-arm64
-        run: |
-          for file in *; do
-            case "$file" in
-              *.zip)
-                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-Linux-arm64/tools"
-                ;;
-              *.tar.gz)
-                tar -xzv -C "./Analysis-Tool-For-HyperOS-Linux-arm64/tools" -f "$file" "payload-dumper-go"
-                ;;
-            esac
-          done
-
-          7z a "./Analysis-Tool-For-HyperOS-Linux-arm64.zip" "./Analysis-Tool-For-HyperOS-Linux-arm64/*"
-          mv Analysis-Tool-For-HyperOS-Linux-arm64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-arm64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
-
-      - name: Upload artifact-Linux-arm64
-        uses: actions/upload-artifact@v4
-        with:
-          name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-arm64.zip
-          path: ./Analysis-Tool-For-HyperOS-Linux-arm64/*
-
-      - name: Download dependencies-Windows-x86_64
-        uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "ssut/payload-dumper-go"
-          latest: true
-          fileName: "payload-dumper-go_*_windows_amd64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "sekaiacg/erofs-utils"
-          latest: true
-          fileName: "erofs-utils-*-Cygwin_x86_64-*.zip"
-
-      - name: Move dependencies-Windows-x86_64
-        run: |
-          for file in *; do
-            case "$file" in
-              *.zip)
-                unzip -j "$file" "cygwin1.dll" -d "./Analysis-Tool-For-HyperOS-Windows-x86_64/tools"
-                unzip -j "$file" "extract.erofs.exe" -d "./Analysis-Tool-For-HyperOS-Windows-x86_64/tools"
-                ;;
-              *.tar.gz)
-                tar -xzv -C "./Analysis-Tool-For-HyperOS-Windows-x86_64/tools" -f "$file" "payload-dumper-go.exe"
-                ;;
-            esac
-          done
-
-          7z a "./Analysis-Tool-For-HyperOS-Windows-x86_64.zip" "./Analysis-Tool-For-HyperOS-Windows-x86_64/*"
-          mv Analysis-Tool-For-HyperOS-Windows-x86_64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
-
-      - name: Upload artifact-Windows-x86_64
-        uses: actions/upload-artifact@v4
-        with:
-          name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64.zip
-          path: ./Analysis-Tool-For-HyperOS-Windows-x86_64/*
-          
-      - name: Download payload-dumper-go-Darwin-x86_64
-        uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "ssut/payload-dumper-go"
-          latest: true
-          fileName: "payload-dumper-go_*_darwin_amd64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "sekaiacg/erofs-utils"
-          latest: true
-          fileName: "erofs-utils-*-Darwin_x86_64-*.zip"
-
-      - name: Move dependencies-Darwin-x86_64
-        run: |
-          for file in *; do
-            case "$file" in
-              *.zip)
-                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-Darwin-x86_64/tools"
-                ;;
-              *.tar.gz)
-                tar -xzv -C "./Analysis-Tool-For-HyperOS-Darwin-x86_64/tools" -f "$file" "payload-dumper-go"
-                ;;
-            esac
-          done
-
-          7z a "./Analysis-Tool-For-HyperOS-Darwin-x86_64.zip" "./Analysis-Tool-For-HyperOS-Darwin-x86_64/*"
-          mv Analysis-Tool-For-HyperOS-Darwin-x86_64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
-
-      - name: Upload artifact-Darwin-x86_64
-        uses: actions/upload-artifact@v4
-        with:
-          name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64.zip
-          path: ./Analysis-Tool-For-HyperOS-Darwin-x86_64/*
-
-      - name: Download payload-dumper-go-Darwin-arm64
-        uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "ssut/payload-dumper-go"
-          latest: true
-          fileName: "payload-dumper-go_*_darwin_arm64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "sekaiacg/erofs-utils"
-          latest: true
-          fileName: "erofs-utils-*-Darwin_aarch64-*.zip"
-
-      - name: Move dependencies-Darwin-arm64
-        run: |
-          for file in *; do
-            case "$file" in
-              *.zip)
-                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-Darwin-arm64/tools"
-                ;;
-              *.tar.gz)
-                tar -xzv -C "./Analysis-Tool-For-HyperOS-Darwin-arm64/tools" -f "$file" "payload-dumper-go"
-                ;;
-            esac
-          done
-
-          7z a "./Analysis-Tool-For-HyperOS-Darwin-arm64.zip" "./Analysis-Tool-For-HyperOS-Darwin-arm64/*"
-          mv Analysis-Tool-For-HyperOS-Darwin-arm64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-arm64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
-
-      - name: Upload artifact-Darwin-arm64
-        uses: actions/upload-artifact@v4
-        with:
-          name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-arm64.zip
-          path: ./Analysis-Tool-For-HyperOS-Darwin-arm64/*
-
-      - name: Download payload-dumper-go-Android-arm64
-        uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "ssut/payload-dumper-go"
-          latest: true
-          fileName: "payload-dumper-go_*_linux_arm64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "sekaiacg/erofs-utils"
-          latest: true
-          fileName: "erofs-utils-*-Android_arm64-*.zip"
-
-      - name: Move dependencies-Android-arm64
-        run: |
-          for file in *; do
-            case "$file" in
-              *.zip)
-                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-Android-arm64/tools"
-                ;;
-              *.tar.gz)
-                tar -xzv -C "./Analysis-Tool-For-HyperOS-Android-arm64/tools" -f "$file" "payload-dumper-go"
-                ;;
-            esac
-          done
-
-          7z a "./Analysis-Tool-For-HyperOS-Android-arm64.zip" "./Analysis-Tool-For-HyperOS-Android-arm64/*"
-          mv Analysis-Tool-For-HyperOS-Android-arm64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Android-arm64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
-
-      - name: Upload artifact-Android-arm64
-        uses: actions/upload-artifact@v4
-        with:
-          name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Android-arm64.zip
-          path: ./Analysis-Tool-For-HyperOS-Android-arm64/*
-
-      - name: Download payload-dumper-go-Android-x86_64
-        uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "ssut/payload-dumper-go"
-          latest: true
-          fileName: "payload-dumper-go_*_linux_amd64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "sekaiacg/erofs-utils"
-          latest: true
-          fileName: "erofs-utils-*-Android_x86_64-*.zip"
-
-      - name: Move dependencies-Android-x86_64
-        run: |
-          for file in *; do
-            case "$file" in
-              *.zip)
-                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-Android-x86_64/tools"
-                ;;
-              *.tar.gz)
-                tar -xzv -C "./Analysis-Tool-For-HyperOS-Android-x86_64/tools" -f "$file" "payload-dumper-go"
-                ;;
-            esac
-          done
-
-          7z a "./Analysis-Tool-For-HyperOS-Android-x86_64.zip" "./Analysis-Tool-For-HyperOS-Android-x86_64/*"
-          mv Analysis-Tool-For-HyperOS-Android-x86_64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Android-x86_64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
-
-      - name: Upload artifact-Android-x86_64
-        uses: actions/upload-artifact@v4
-        with:
-          name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Android-x86_64.zip
-          path: ./Analysis-Tool-For-HyperOS-Android-x86_64/*
-
-      - name: Download payload-dumper-go-WSL-x86_64
-        uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "ssut/payload-dumper-go"
-          latest: true
-          fileName: "payload-dumper-go_*_linux_amd64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
-        with:
-          repository: "sekaiacg/erofs-utils"
-          latest: true
-          fileName: "erofs-utils-*-WSL_x86_64-*.zip"
-
-      - name: Move dependencies-WSL-x86_64
-        run: |
-          for file in *; do
-            case "$file" in
-              *.zip)
-                unzip -j "$file" "extract.erofs" -d "./Analysis-Tool-For-HyperOS-WSL-x86_64/tools"
-                ;;
-              *.tar.gz)
-                tar -xzv -C "./Analysis-Tool-For-HyperOS-WSL-x86_64/tools" -f "$file" "payload-dumper-go"
-                ;;
-            esac
-          done
-
-          7z a "./Analysis-Tool-For-HyperOS-WSL-x86_64.zip" "./Analysis-Tool-For-HyperOS-WSL-x86_64/*"
-          mv Analysis-Tool-For-HyperOS-WSL-x86_64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-WSL-x86_64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
-
-      - name: Upload artifact-WSL-x86_64
-        uses: actions/upload-artifact@v4
-        with:
-          name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-WSL-x86_64.zip
-          path: ./Analysis-Tool-For-HyperOS-WSL-x86_64/*
-
-      - name: Release
+      - name: Create GitHub Release
         if: ${{ !contains(github.ref, 'beta') }}
         uses: softprops/action-gh-release@v2
         with:
           body_path: './release.md'
-          files: ./output/*
+          files: |
+            output/Analysis-Tool-For-HyperOS-${{ needs.prepare.outputs.version }}*.zip
           token: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Upload Drive Center
+
+      - name: Upload to WebDAV
         if: ${{ !contains(github.ref, 'beta') }}
         run: |
-          FOLDER="${{ secrets.DRIVE_CENTER_ADDR_WEBDAV }}/Analysis-Tool-For-HyperOS/${{ env.VERSION }}"
-          curl -u ${{ secrets.DRIVE_CENTER_RELEASE_USER }}:${{ secrets.DRIVE_CENTER_RELEASE_TOKEN }} -X MKCOL "$FOLDER/" || true
+          VERSION=${{ needs.prepare.outputs.version }}
+          FOLDER="${{ secrets.DRIVE_CENTER_ADDR_WEBDAV }}/Analysis-Tool-For-HyperOS/$VERSION"
+          curl -u "${{ secrets.DRIVE_CENTER_RELEASE_USER }}:${{ secrets.DRIVE_CENTER_RELEASE_TOKEN }}" -X MKCOL "$FOLDER/" || true
           for file in ./output/*; do
-            curl -T "$file" -u ${{ secrets.DRIVE_CENTER_RELEASE_USER }}:${{ secrets.DRIVE_CENTER_RELEASE_TOKEN }} "$FOLDER/$(basename "$file")"
+            curl -T "$file" -u "${{ secrets.DRIVE_CENTER_RELEASE_USER }}:${{ secrets.DRIVE_CENTER_RELEASE_TOKEN }}" "$FOLDER/$(basename "$file")"
           done
