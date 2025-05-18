@@ -10,6 +10,12 @@
 # 忽略所有 .zip 文件
 *.zip
 
+# 忽略所有 .exe 文件
+*.exe
+
+# 忽略所有 .dll 文件
+*.dll
+
 # 忽略指定的文件
 /app_code_name.json
 /app_code.json

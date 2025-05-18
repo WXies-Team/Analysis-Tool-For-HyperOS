@@ -1,6 +1,5 @@
 import os  # 引入 OS 模块，用于操作文件和目录
 import glob  # 引入 glob 模块，用于搜索文件夹中的文件
-import platform # 引入 platform 模块，用于读取设备信息
 
 # 获取当前脚本文件所在目录的绝对路径
 src_dir = os.path.abspath(__file__)
