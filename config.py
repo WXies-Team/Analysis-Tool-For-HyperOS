@@ -53,17 +53,19 @@ is_fold = [
            "goku"
           ]
 is_pad = [
+          "spark", 
+          "flare", 
           "nabu", 
           "elish", 
           "enuma", 
           "dagu", 
+          "yunluo", 
           "pipa", 
           "liuqin", 
           "yudi", 
-          "yunluo", 
           "xun", 
-          "sheng", 
-          "dizi", 
+          "sheng",
+          "dizi",
           "ruan",
           "uke",
           "muyu",
