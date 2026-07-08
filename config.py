@@ -47,9 +47,9 @@ partitions = [
 
 # 设备种类识别
 is_fold = [
-           "cetus", 
-           "zizhan", 
-           "babylon", 
+           "cetus",
+           "zizhan",
+           "babylon",
            "goku"
           ]
 is_pad = [
@@ -69,10 +69,21 @@ is_pad = [
           "ruan",
           "uke",
           "muyu",
-          "jinghu"
+          "jinghu",
+          "violin",
+          "yupei",
+          "piano",
+          "taiko",
+          "flute",
+          "organ",
+          "guitar",
+          "erhu",
+          "turner",
+          "yili"
          ]
 is_flip = [
-           "ruyi"
+           "ruyi",
+           "bixi"
           ]
 
 # 需要删除的文件

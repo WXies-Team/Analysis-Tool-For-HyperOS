@@ -3,7 +3,7 @@ import shutil  # 导入 shutil 模块，用于复制、移动、删除文件和�
 import subprocess  # 导入 subprocess 模块，用于执行系统命令
 import fnmatch  # 导入 fnmatch 模块，用于文件名匹配
 import json  # 导入 json 模块，用于读写 JSON 格式的数据
-from apkfile import ApkFile  # 导入 apkfile 中定义的 ApkFile 类
+from androguard.core.apk import APK  # 导入 androguard 中定义的 APK 类
 
 def move_json(backup, type_name):
     def move_files(type_n):
@@ -259,14 +259,14 @@ def rename_apk(apk_files):
         apk_path = os.path.join(output_dir, apk_file)
 
         try:
-            # 使用 apkfile 库读取 apk 包信息
-            apk = ApkFile(apk_path)
+            # 使用 androguard 库读取 apk 包信息
+            apk = APK(apk_path)
 
             # 获取 apk 的包名和版本号
-            package_name = apk.package_name
-            version_name = apk.version_name
+            package_name = apk.get_package()
+            version_name = apk.get_androidversion_name()
             # version_code
-            version_code = apk.version_code
+            version_code = int(apk.get_androidversion_code())
 
             # 构建新文件名
             new_name = f"{package_name}^{version_name}^{version_code}.apk"
