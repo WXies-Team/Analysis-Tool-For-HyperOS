@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -47,7 +47,7 @@ jobs:
           done
 
       - name: Checkout code into separate directory
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: 'repo'
 
@@ -73,12 +73,12 @@ jobs:
           cp -r ./repo/* "./Analysis-Tool-For-HyperOS-WSL-x86_64/"
 
       - name: Download dependencies-Linux-x86_64
-        uses: robinraju/release-downloader@v1.10
+        uses: robinraju/release-downloader@v1.13
         with:
           repository: "ssut/payload-dumper-go"
           latest: true
           fileName: "payload-dumper-go_*_linux_amd64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
+      - uses: robinraju/release-downloader@v1.13
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
@@ -103,18 +103,18 @@ jobs:
           rm -f ./*.tar.gz
 
       - name: Upload artifact-Linux-x86_64
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64.zip
           path: ./Analysis-Tool-For-HyperOS-Linux-x86_64/*
 
       - name: Download dependencies-Linux-arm64
-        uses: robinraju/release-downloader@v1.10
+        uses: robinraju/release-downloader@v1.13
         with:
           repository: "ssut/payload-dumper-go"
           latest: true
           fileName: "payload-dumper-go_*_linux_arm64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
+      - uses: robinraju/release-downloader@v1.13
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
@@ -139,18 +139,18 @@ jobs:
           rm -f ./*.tar.gz
 
       - name: Upload artifact-Linux-arm64
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-arm64.zip
           path: ./Analysis-Tool-For-HyperOS-Linux-arm64/*
 
       - name: Download dependencies-Windows-x86_64
-        uses: robinraju/release-downloader@v1.10
+        uses: robinraju/release-downloader@v1.13
         with:
           repository: "ssut/payload-dumper-go"
           latest: true
           fileName: "payload-dumper-go_*_windows_amd64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
+      - uses: robinraju/release-downloader@v1.13
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
@@ -176,18 +176,18 @@ jobs:
           rm -f ./*.tar.gz
 
       - name: Upload artifact-Windows-x86_64
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64.zip
           path: ./Analysis-Tool-For-HyperOS-Windows-x86_64/*
           
       - name: Download payload-dumper-go-Darwin-x86_64
-        uses: robinraju/release-downloader@v1.10
+        uses: robinraju/release-downloader@v1.13
         with:
           repository: "ssut/payload-dumper-go"
           latest: true
           fileName: "payload-dumper-go_*_darwin_amd64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
+      - uses: robinraju/release-downloader@v1.13
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
@@ -212,18 +212,18 @@ jobs:
           rm -f ./*.tar.gz
 
       - name: Upload artifact-Darwin-x86_64
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64.zip
           path: ./Analysis-Tool-For-HyperOS-Darwin-x86_64/*
 
       - name: Download payload-dumper-go-Darwin-arm64
-        uses: robinraju/release-downloader@v1.10
+        uses: robinraju/release-downloader@v1.13
         with:
           repository: "ssut/payload-dumper-go"
           latest: true
           fileName: "payload-dumper-go_*_darwin_arm64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
+      - uses: robinraju/release-downloader@v1.13
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
@@ -248,18 +248,18 @@ jobs:
           rm -f ./*.tar.gz
 
       - name: Upload artifact-Darwin-arm64
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-arm64.zip
           path: ./Analysis-Tool-For-HyperOS-Darwin-arm64/*
 
       - name: Download payload-dumper-go-Android-arm64
-        uses: robinraju/release-downloader@v1.10
+        uses: robinraju/release-downloader@v1.13
         with:
           repository: "ssut/payload-dumper-go"
           latest: true
           fileName: "payload-dumper-go_*_linux_arm64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
+      - uses: robinraju/release-downloader@v1.13
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
@@ -284,18 +284,18 @@ jobs:
           rm -f ./*.tar.gz
 
       - name: Upload artifact-Android-arm64
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Android-arm64.zip
           path: ./Analysis-Tool-For-HyperOS-Android-arm64/*
 
       - name: Download payload-dumper-go-Android-x86_64
-        uses: robinraju/release-downloader@v1.10
+        uses: robinraju/release-downloader@v1.13
         with:
           repository: "ssut/payload-dumper-go"
           latest: true
           fileName: "payload-dumper-go_*_linux_amd64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
+      - uses: robinraju/release-downloader@v1.13
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
@@ -320,18 +320,18 @@ jobs:
           rm -f ./*.tar.gz
 
       - name: Upload artifact-Android-x86_64
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Android-x86_64.zip
           path: ./Analysis-Tool-For-HyperOS-Android-x86_64/*
 
       - name: Download payload-dumper-go-WSL-x86_64
-        uses: robinraju/release-downloader@v1.10
+        uses: robinraju/release-downloader@v1.13
         with:
           repository: "ssut/payload-dumper-go"
           latest: true
           fileName: "payload-dumper-go_*_linux_amd64.tar.gz"
-      - uses: robinraju/release-downloader@v1.10
+      - uses: robinraju/release-downloader@v1.13
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
@@ -356,14 +356,14 @@ jobs:
           rm -f ./*.tar.gz
 
       - name: Upload artifact-WSL-x86_64
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-WSL-x86_64.zip
           path: ./Analysis-Tool-For-HyperOS-WSL-x86_64/*
 
       - name: Release
         if: ${{ !contains(github.ref, 'beta') }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           body_path: './release.md'
           files: ./output/*
