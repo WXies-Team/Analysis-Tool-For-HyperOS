@@ -123,14 +123,26 @@ jobs:
       run: |
         python main.py -n -u -m
 
-    - name: Upload output artifacts
+    - name: Upload database
       uses: actions/upload-artifact@v6
       with:
-        name: Analysis-Output
+        name: Database
         path: |
           app_version.json
           app_code.json
+
+    - name: Upload build.prop
+      uses: actions/upload-artifact@v6
+      with:
+        name: build.prop
+        path: |
           product/etc/build.prop
+
+    - name: Upload update apk
+      uses: actions/upload-artifact@v6
+      with:
+        name: Update_apk
+        path: |
           update_apk
           update_name_apk
 
