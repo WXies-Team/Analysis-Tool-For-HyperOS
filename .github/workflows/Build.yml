@@ -82,7 +82,7 @@ jobs:
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
-          fileName: "erofs-utils-*-Linux_x86_64-*.zip"
+          fileName: "erofs-utils-*Linux_x86_64*.zip"
 
       - name: Move dependencies-Linux-x86_64
         run: |
@@ -99,8 +99,8 @@ jobs:
 
           7z a "./Analysis-Tool-For-HyperOS-Linux-x86_64.zip" "./Analysis-Tool-For-HyperOS-Linux-x86_64/*"
           mv Analysis-Tool-For-HyperOS-Linux-x86_64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-x86_64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
+          rm -f ./*.zip
+          rm -f ./*.tar.gz
 
       - name: Upload artifact-Linux-x86_64
         uses: actions/upload-artifact@v4
@@ -118,7 +118,7 @@ jobs:
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
-          fileName: "erofs-utils-*-Linux_aarch64-*.zip"
+          fileName: "erofs-utils-*Linux_aarch64*.zip"
 
       - name: Move dependencies-Linux-arm64
         run: |
@@ -135,8 +135,8 @@ jobs:
 
           7z a "./Analysis-Tool-For-HyperOS-Linux-arm64.zip" "./Analysis-Tool-For-HyperOS-Linux-arm64/*"
           mv Analysis-Tool-For-HyperOS-Linux-arm64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Linux-arm64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
+          rm -f ./*.zip
+          rm -f ./*.tar.gz
 
       - name: Upload artifact-Linux-arm64
         uses: actions/upload-artifact@v4
@@ -154,7 +154,7 @@ jobs:
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
-          fileName: "erofs-utils-*-Cygwin_x86_64-*.zip"
+          fileName: "erofs-utils-*Cygwin_x86_64*.zip"
 
       - name: Move dependencies-Windows-x86_64
         run: |
@@ -172,8 +172,8 @@ jobs:
 
           7z a "./Analysis-Tool-For-HyperOS-Windows-x86_64.zip" "./Analysis-Tool-For-HyperOS-Windows-x86_64/*"
           mv Analysis-Tool-For-HyperOS-Windows-x86_64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
+          rm -f ./*.zip
+          rm -f ./*.tar.gz
 
       - name: Upload artifact-Windows-x86_64
         uses: actions/upload-artifact@v4
@@ -191,7 +191,7 @@ jobs:
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
-          fileName: "erofs-utils-*-Darwin_x86_64-*.zip"
+          fileName: "erofs-utils-*Darwin_x86_64*.zip"
 
       - name: Move dependencies-Darwin-x86_64
         run: |
@@ -208,8 +208,8 @@ jobs:
 
           7z a "./Analysis-Tool-For-HyperOS-Darwin-x86_64.zip" "./Analysis-Tool-For-HyperOS-Darwin-x86_64/*"
           mv Analysis-Tool-For-HyperOS-Darwin-x86_64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-x86_64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
+          rm -f ./*.zip
+          rm -f ./*.tar.gz
 
       - name: Upload artifact-Darwin-x86_64
         uses: actions/upload-artifact@v4
@@ -227,7 +227,7 @@ jobs:
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
-          fileName: "erofs-utils-*-Darwin_aarch64-*.zip"
+          fileName: "erofs-utils-*Darwin_aarch64*.zip"
 
       - name: Move dependencies-Darwin-arm64
         run: |
@@ -244,8 +244,8 @@ jobs:
 
           7z a "./Analysis-Tool-For-HyperOS-Darwin-arm64.zip" "./Analysis-Tool-For-HyperOS-Darwin-arm64/*"
           mv Analysis-Tool-For-HyperOS-Darwin-arm64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Darwin-arm64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
+          rm -f ./*.zip
+          rm -f ./*.tar.gz
 
       - name: Upload artifact-Darwin-arm64
         uses: actions/upload-artifact@v4
@@ -263,7 +263,7 @@ jobs:
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
-          fileName: "erofs-utils-*-Android_arm64-*.zip"
+          fileName: "erofs-utils-*Android_arm64*.zip"
 
       - name: Move dependencies-Android-arm64
         run: |
@@ -280,8 +280,8 @@ jobs:
 
           7z a "./Analysis-Tool-For-HyperOS-Android-arm64.zip" "./Analysis-Tool-For-HyperOS-Android-arm64/*"
           mv Analysis-Tool-For-HyperOS-Android-arm64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Android-arm64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
+          rm -f ./*.zip
+          rm -f ./*.tar.gz
 
       - name: Upload artifact-Android-arm64
         uses: actions/upload-artifact@v4
@@ -299,7 +299,7 @@ jobs:
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
-          fileName: "erofs-utils-*-Android_x86_64-*.zip"
+          fileName: "erofs-utils-*Android_x86_64*.zip"
 
       - name: Move dependencies-Android-x86_64
         run: |
@@ -316,8 +316,8 @@ jobs:
 
           7z a "./Analysis-Tool-For-HyperOS-Android-x86_64.zip" "./Analysis-Tool-For-HyperOS-Android-x86_64/*"
           mv Analysis-Tool-For-HyperOS-Android-x86_64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Android-x86_64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
+          rm -f ./*.zip
+          rm -f ./*.tar.gz
 
       - name: Upload artifact-Android-x86_64
         uses: actions/upload-artifact@v4
@@ -335,7 +335,7 @@ jobs:
         with:
           repository: "sekaiacg/erofs-utils"
           latest: true
-          fileName: "erofs-utils-*-WSL_x86_64-*.zip"
+          fileName: "erofs-utils-*WSL_x86_64*.zip"
 
       - name: Move dependencies-WSL-x86_64
         run: |
@@ -352,8 +352,8 @@ jobs:
 
           7z a "./Analysis-Tool-For-HyperOS-WSL-x86_64.zip" "./Analysis-Tool-For-HyperOS-WSL-x86_64/*"
           mv Analysis-Tool-For-HyperOS-WSL-x86_64.zip "output/Analysis-Tool-For-HyperOS-${{ env.VERSION }}-WSL-x86_64.zip"
-          rm ./*.zip
-          rm ./*.tar.gz
+          rm -f ./*.zip
+          rm -f ./*.tar.gz
 
       - name: Upload artifact-WSL-x86_64
         uses: actions/upload-artifact@v4

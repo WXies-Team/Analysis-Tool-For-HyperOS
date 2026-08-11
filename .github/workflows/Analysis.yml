@@ -49,7 +49,7 @@ jobs:
         repository: "sekaiacg/erofs-utils"
         latest: true
         extract: true
-        fileName: "erofs-utils-*-Linux_x86_64-*.zip"
+        fileName: "erofs-utils-*Linux_x86_64*.zip"
         
     - name: Install dependence
       run: |
