@@ -3,7 +3,27 @@ import shutil  # 导入 shutil 模块，用于复制、移动、删除文件和�
 import subprocess  # 导入 subprocess 模块，用于执行系统命令
 import fnmatch  # 导入 fnmatch 模块，用于文件名匹配
 import json  # 导入 json 模块，用于读写 JSON 格式的数据
-from androguard.core.apk import APK  # 导入 androguard 中定义的 APK 类
+from concurrent.futures import ProcessPoolExecutor  # 用于并行处理 APK 文件
+
+
+def _process_apk_for_rename(apk_path):
+    """使用 androguard 解析单个 APK 并重命名，供多进程并行调用"""
+    from androguard.core.apk import APK
+
+    try:
+        apk = APK(apk_path)
+        package_name = apk.get_package()
+        version_name = apk.get_androidversion_name()
+        version_code = int(apk.get_androidversion_code())
+        new_name = f"{package_name}^{version_name}^{version_code}.apk"
+        dst = os.path.join(os.path.dirname(apk_path), new_name)
+        if not os.path.exists(dst):
+            os.rename(apk_path, dst)
+        return None
+    except FileNotFoundError as e:
+        return "aapt"
+    except Exception as e:
+        return f"异常，报错信息: {e}"
 
 def move_json(backup, type_name):
     def move_files(type_n):
@@ -254,31 +274,16 @@ def remove_some_apk(exclude_apk):
 
 
 def rename_apk(apk_files):
-    # 遍历每个 apk 文件
-    for apk_file in apk_files:
-        apk_path = os.path.join(output_dir, apk_file)
-
-        try:
-            # 使用 androguard 库读取 apk 包信息
-            apk = APK(apk_path)
-
-            # 获取 apk 的包名和版本号
-            package_name = apk.get_package()
-            version_name = apk.get_androidversion_name()
-            # version_code
-            version_code = int(apk.get_androidversion_code())
-
-            # 构建新文件名
-            new_name = f"{package_name}^{version_name}^{version_code}.apk"
-
-            # 重命名 apk 文件
-            if not os.path.exists(os.path.join(output_dir, new_name)):
-                os.rename(apk_path, os.path.join(output_dir, new_name))
-        except FileNotFoundError as e:
-            print("异常：缺失 Android aapt 环境，请先安装依赖后重试")
-            break
-        except Exception as e:
-            print(f"异常，报错信息: {e}")
+    # 并行解析并重命名 apk 文件
+    apk_paths = [os.path.join(output_dir, apk_file) for apk_file in apk_files]
+    workers = min(os.cpu_count() or 1, 8)
+    with ProcessPoolExecutor(max_workers=workers) as executor:
+        for result in executor.map(_process_apk_for_rename, apk_paths):
+            if result == "aapt":
+                print("异常：缺失 Android aapt 环境，请先安装依赖后重试")
+                break
+            elif result:
+                print(result)
 
 
 # 定义更新 apk 版本的函数，遍历输出目录下的 apk 文件，并更新本地词典
