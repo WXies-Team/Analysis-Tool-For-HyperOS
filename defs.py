@@ -20,8 +20,6 @@ def _process_apk_for_rename(apk_path):
         if not os.path.exists(dst):
             os.rename(apk_path, dst)
         return None
-    except FileNotFoundError as e:
-        return "aapt"
     except Exception as e:
         return f"异常，报错信息: {e}"
 
@@ -279,10 +277,7 @@ def rename_apk(apk_files):
     workers = min(os.cpu_count() or 1, 8)
     with ProcessPoolExecutor(max_workers=workers) as executor:
         for result in executor.map(_process_apk_for_rename, apk_paths):
-            if result == "aapt":
-                print("异常：缺失 Android aapt 环境，请先安装依赖后重试")
-                break
-            elif result:
+            if result:
                 print(result)
 
 

@@ -64,9 +64,6 @@ jobs:
         mv extract.erofs tools/
         mv payload-dumper-go tools/
 
-        SDK_BUILD_TOOLS=$(ls "$ANDROID_SDK_ROOT/build-tools/" | sort -V | tail -1)
-        echo "$ANDROID_SDK_ROOT/build-tools/$SDK_BUILD_TOOLS" >> "$GITHUB_PATH"
-
         pip install -r requirements.txt
 
     - name: Set permission
