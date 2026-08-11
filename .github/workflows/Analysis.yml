@@ -164,8 +164,9 @@ jobs:
             exit 1
           fi
         if [ "${{ github.event.inputs.push }}" = "是" ]; then
-            git commit -m "chore: update ${{ github.event.inputs.devicename }} ${{ github.event.inputs.osversion }} by action"
-            git push
+            git commit -m "chore: update ${{ github.event.inputs.devicename }} ${{ github.event.inputs.osversion }} by action" || exit 0
+            git pull --rebase origin main || { git rebase --abort 2>/dev/null; exit 0; }
+            git push || exit 0
           elif [ "${{ github.event.inputs.push }}" = "否" ]; then
             exit 0
           else
