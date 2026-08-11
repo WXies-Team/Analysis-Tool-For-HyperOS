@@ -3,7 +3,11 @@ import shutil  # 导入 shutil 模块，用于复制、移动、删除文件和�
 import subprocess  # 导入 subprocess 模块，用于执行系统命令
 import fnmatch  # 导入 fnmatch 模块，用于文件名匹配
 import json  # 导入 json 模块，用于读写 JSON 格式的数据
+import zipfile  # 导入 zipfile 模块，用于打包 APK 集合
 from concurrent.futures import ProcessPoolExecutor  # 用于并行处理 APK 文件
+
+# 记录每个包名对应的 split APK 路径，由 rename_apk 填充
+_splits_by_package = {}
 
 
 def _process_apk_for_rename(apk_path):
@@ -14,7 +18,7 @@ def _process_apk_for_rename(apk_path):
         apk = APK(apk_path)
         manifest = apk.get_android_manifest_xml()
         if manifest is not None and manifest.get(APK._ns("split")):
-            return None
+            return ("split", apk.get_package(), apk_path)
         package_name = apk.get_package()
         version_name = apk.get_androidversion_name()
         version_code = int(apk.get_androidversion_code())
@@ -276,12 +280,33 @@ def remove_some_apk(exclude_apk):
 
 def rename_apk(apk_files):
     # 并行解析并重命名 apk 文件
+    global _splits_by_package
+    _splits_by_package = {}
     apk_paths = [os.path.join(output_dir, apk_file) for apk_file in apk_files]
     workers = min(os.cpu_count() or 1, 8)
     with ProcessPoolExecutor(max_workers=workers) as executor:
         for result in executor.map(_process_apk_for_rename, apk_paths):
-            if result:
+            if isinstance(result, tuple) and result and result[0] == "split":
+                _, package, path = result
+                _splits_by_package.setdefault(package, []).append(path)
+            elif result:
                 print(result)
+
+
+def _deliver_update(package, apk_file, folder):
+    """复制更新的 APK 及其同包名 splits，并打包成 .apks 文件"""
+    src = os.path.join(output_dir, apk_file)
+    shutil.copy2(src, os.path.join(folder, apk_file))
+    print(f"已将 {apk_file} 复制到 {folder} 文件夹")
+    splits = _splits_by_package.get(package, [])
+    for split_path in splits:
+        shutil.copy2(split_path, os.path.join(folder, os.path.basename(split_path)))
+    set_name = os.path.splitext(apk_file)[0] + ".apks"
+    with zipfile.ZipFile(os.path.join(folder, set_name), "w", zipfile.ZIP_STORED) as zf:
+        zf.write(src, "base.apk")
+        for split_path in splits:
+            zf.write(split_path, os.path.basename(split_path))
+    print(f"已将 {set_name} 打包到 {folder} 文件夹\n")
 
 
 # 定义更新 apk 版本的函数，遍历输出目录下的 apk 文件，并更新本地词典
@@ -307,28 +332,16 @@ def update_apk_version(apk_version, apk_code, apk_code_name):
                             apk_version[x] = y
                             apk_code[x] = int(z) # 以 int 格式写入
                             apk_code_name[x] = int(z) # 以 int 格式写入
-                            # 复制新版本的 APK 文件到 update_apk 文件夹
-                            src = os.path.join(output_dir, apk_file)
-                            dst = os.path.join(update_apk_folder, apk_file)
-                            shutil.copy2(src, dst)
-                            print(f"已将 {apk_file} 复制到 {update_apk_folder} 文件夹\n")
+                            _deliver_update(x, apk_file, update_apk_folder)
                         else:
                             # 更新本地词典中的版本号
                             apk_version[x] = y
                             apk_code[x] = int(z) # 以 int 格式写入
-                            # 复制新版本的 APK 文件到 update_apk 文件夹
-                            src = os.path.join(output_dir, apk_file)
-                            dst = os.path.join(update_apk_folder, apk_file)
-                            shutil.copy2(src, dst)
-                            print(f"已将 {apk_file} 复制到 {update_apk_folder} 文件夹\n")
+                            _deliver_update(x, apk_file, update_apk_folder)
                     elif apk_code[x] == int(z):
                         if apk_version[x] != y:
                             print(f"疑似更新 {x}：{apk_version[x]} -> {y}")
-                            # 复制新版本的 APK 文件到 update_name_apk 文件夹
-                            src = os.path.join(output_dir, apk_file)
-                            dst = os.path.join(update_apk_name_folder, apk_file)
-                            shutil.copy2(src, dst)
-                            print(f"已将 {apk_file} 复制到 {update_apk_name_folder} 文件夹\n")
+                            _deliver_update(x, apk_file, update_apk_name_folder)
                 # 如果包名不在本地词典中
                 else:
                     print(f"添加新应用 {x}:{y}({z})\n")
