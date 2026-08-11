@@ -20,7 +20,7 @@ def _process_apk_for_rename(apk_path):
         if manifest is not None and manifest.get(APK._ns("split")):
             return ("split", apk.get_package(), apk_path)
         package_name = apk.get_package()
-        version_name = apk.get_androidversion_name()
+        version_name = apk.get_androidversion_name() or ""
         version_code = int(apk.get_androidversion_code())
         new_name = f"{package_name}^{version_name}^{version_code}.apk"
         dst = os.path.join(os.path.dirname(apk_path), new_name)
