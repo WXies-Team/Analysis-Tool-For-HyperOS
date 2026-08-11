@@ -225,6 +225,14 @@ def extract_img():
     subprocess.run(["./tools/payload-dumper-go", "-c", "8", "-o","./", "-p", partition_string, "payload.bin"])
 
 
+def normalize_product_name(name):
+    """去除小米 product name 中的 miproduct_/miproduct- 前缀"""
+    for prefix in ("miproduct_", "miproduct-"):
+        if name.startswith(prefix):
+            return name[len(prefix):]
+    return name
+
+
 def extract_files():
     try:
         # 提取镜像文件中的文件
@@ -235,7 +243,7 @@ def extract_files():
         with open("./product/etc/build.prop", "r") as file:
             for line in file:
                 if line.startswith("ro.product.product.name"):
-                    device_name = line.split("=")[1].strip()
+                    device_name = normalize_product_name(line.split("=")[1].strip())
                     print(f"设备名: {device_name}")
 
                     if device_name in is_fold:
@@ -465,6 +473,8 @@ def get_info():
                 for line in lines:
                     if line.startswith(key):
                         value = line.split("=")[1].strip()
+                        if key == "ro.product.product.name":
+                            value = normalize_product_name(value)
                         print(f"{label}: {value}")
                         break
     except FileNotFoundError:
