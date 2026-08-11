@@ -84,13 +84,10 @@ auth-master.apk
 auth-xxhdpi.apk
 screen_recorder-master.apk
 screen_recorder-xxhdpi.apk
-split-XiaomiServiceFrameworkCN-master.apk
-split-XiaomiServiceFrameworkCN-xxhdpi.apk
 WifiResCommonMainline_Sys.apk
 WifiResCommon_Sys.apk
 UwbResCommon_Sys.apk
 DeviceStatisticsService.apk
-split-XiaomiServiceFrameworkCN-xhdpi.apk
 auth-xhdpi.apk
 screen_recorder-xhdpi.apk
 MiuiCredentialManager.apk
@@ -107,7 +104,6 @@ AospWifiResOverlay_mainline.apk
 framework-res__nosdcard__auto_generated_characteristics_rro.apk
 auth-xxxhdpi.apk
 screen_recorder-xxxhdpi.apk
-split-XiaomiServiceFrameworkCN-xxxhdpi.apk
 atom-xxhdpi.apk
 atom-hdpi.apk
 MiuiLocationTimeZoneProviderService.apk
@@ -116,7 +112,6 @@ HotwordEnrollmentXGoogleRISCV.apk
 atom-hdpi.apk
 auth-hdpi.apk
 screen_recorder-hdpi.apk
-split-XiaomiServiceFrameworkCN-hdpi.apk
 SarAuthN83.apk
 cit.apk
 AutoTest.apk
@@ -124,5 +119,4 @@ CatchLog_Lc.apk
 Bdsms.apk
 PhotoTable.apk
 messaging.apk
-split-XiaomiServiceFrameworkCN-arm64_v8a.apk
 SystemHelper.apk
