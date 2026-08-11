@@ -12,6 +12,9 @@ def _process_apk_for_rename(apk_path):
 
     try:
         apk = APK(apk_path)
+        manifest = apk.get_android_manifest_xml()
+        if manifest is not None and manifest.get(APK._ns("split")):
+            return None
         package_name = apk.get_package()
         version_name = apk.get_androidversion_name()
         version_code = int(apk.get_androidversion_code())
