@@ -51,13 +51,22 @@ jobs:
         extract: true
         fileName: "erofs-utils-*Linux_x86_64*.zip"
         
+    - name: Cache pip
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: pip-
+
     - name: Install dependence
       run: |
         mkdir tools
         mv extract.erofs tools/
         mv payload-dumper-go tools/
 
-        sudo apt-get install -y android-sdk-build-tools
+        SDK_BUILD_TOOLS=$(ls "$ANDROID_SDK_ROOT/build-tools/" | sort -V | tail -1)
+        echo "$ANDROID_SDK_ROOT/build-tools/$SDK_BUILD_TOOLS" >> "$GITHUB_PATH"
+
         pip install -r requirements.txt
 
     - name: Set permission
@@ -113,38 +122,18 @@ jobs:
           output_apk/MiuiHome.apk
           output_apk/AiAsstVision.apk
           
-    - name: Get version
+    - name: Update database & rename
       run: |
-        python main.py -n
+        python main.py -n -u -m
 
-    - name: Update database
-      run: |
-        python main.py -u
-
-    - name: Rename
-      run: |
-        python main.py -m
-
-    - name: Upload database
+    - name: Upload output artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: Database
+        name: Analysis-Output
         path: |
           app_version.json
           app_code.json
-
-    - name: Upload build.prop
-      uses: actions/upload-artifact@v4
-      with:
-        name: build.prop
-        path: |
           product/etc/build.prop
-    
-    - name: Upload update apk
-      uses: actions/upload-artifact@v4
-      with:
-        name: Update_apk
-        path: |
           update_apk
           update_name_apk
 
