@@ -289,7 +289,11 @@ def update_apk_version(apk_version, apk_code, apk_code_name):
         if apk_file.endswith(".apk"):
             # 解析文件名，获取包名和版本号
             try:
-                x, y, z = os.path.splitext(apk_file)[0].split("^")
+                parts = os.path.splitext(apk_file)[0].split("^")
+                if len(parts) != 3:
+                    print(f"跳过非标准文件名: {apk_file}")
+                    continue
+                x, y, z = parts
                 # 如果包名在本地词典中
                 if x in apk_code:
                     # 如果本地词典中的版本号比 Apk 记录的版本号低
@@ -330,7 +334,7 @@ def update_apk_version(apk_version, apk_code, apk_code_name):
                     apk_code[x] = int(z) # 以 int 格式写入
             except Exception as e:
                 print(f"异常，报错信息: {e}")
-                return
+                continue
 
     # 保存本地词典到json文件
     with open(APK_VERSION, "w") as f:
@@ -376,7 +380,11 @@ def update_apk_name():
             # 如果文件名以".apk"结尾
             if apk_file.endswith(".apk"):
                 # 解析文件名，获取包名和版本号
-                x, y, z = os.path.splitext(apk_file)[0].split("^")
+                parts = os.path.splitext(apk_file)[0].split("^")
+                if len(parts) != 3:
+                    print(f"跳过非标准文件名: {apk_file}")
+                    continue
+                x, y, z = parts
                 # 如果解析的文件名在字典里
                 if x in name_dict:
                     if x in code_dict:
