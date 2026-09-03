@@ -2,8 +2,14 @@ name: Build
 
 on:
   push:
+    branches:
+      - main
     tags:
-      - 'v*'
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-beta.[0-9]+'
+
+permissions:
+  contents: write
 
 jobs:
   Build:
@@ -14,37 +20,73 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get version
+      # ponytail: Build ID 直接取 github.run_number，重跑同一 run 会复用同一 ID；
+      # 若要求"重构建必须换新 ID"，需改为 CI 回写仓库计数文件
+      - name: Determine channel and version
         run: |
-          VERSION=${GITHUB_REF/refs\/tags\//}
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Generate release.md
-        run: |
-          tags=($(git tag --merged $(git rev-parse HEAD) --sort=-creatordate))
-          preTag=$(curl --silent "https://api.github.com/repos/WXies-Team/Analysis-Tool-For-HyperOS/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")' || echo "")
-          currentTag=""
-          for ((i = 0; i <= ${#tags[@]}; i++)); do
-            if (( i < ${#tags[@]} )); then
-              tag=${tags[$i]}
+          BUILD_ID=${{ github.run_number }}
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            TAG=${GITHUB_REF#refs/tags/}
+            if [[ ! "$TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-beta\.[0-9]+)?$ ]]; then
+              echo "非法 tag: $TAG，只允许 x.y.z 或 x.y.z-beta.N（禁止 v 前缀等额外前后缀）"
+              exit 1
+            fi
+            if [[ "$TAG" == *-beta.* ]]; then
+              CHANNEL=beta
             else
-              tag=""
+              CHANNEL=stable
             fi
-            if [ -n "$currentTag" ]; then
-              if [ "$(echo -e "$currentTag\n$preTag" | sort -V | head -n 1)" == "$currentTag" ]; then
-                break
-              fi
+            VERSION="$TAG"
+          else
+            CHANNEL=alpha
+            TARGET=$(tr -d '[:space:]' < VERSION)
+            if [[ ! "$TARGET" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "VERSION 文件格式错误: '$TARGET'，应为 MAJOR.MINOR.PATCH"
+              exit 1
             fi
-            if [ -n "$currentTag" ]; then
-              if [ -n "$tag" ]; then
-                git log --pretty=format:"%B" "$tag..$currentTag" | awk 'NF {print "- " $0} !NF {print ""}' >> release.md
-              else
-                git log --pretty=format:"%B" "$currentTag" | awk 'NF {print "- " $0} !NF {print ""}' >> release.md
-              fi
-              echo "" >> release.md
-            fi
-            currentTag=$tag
-          done
+            VERSION="$TARGET-alpha.$BUILD_ID"
+          fi
+          {
+            echo "CHANNEL=$CHANNEL"
+            echo "BUILD_ID=$BUILD_ID"
+            echo "VERSION_CODE=$BUILD_ID"
+            echo "VERSION=$VERSION"
+          } >> "$GITHUB_ENV"
+          echo "Channel: $CHANNEL / Version Name: $VERSION / Build ID = Version Code: $BUILD_ID"
+
+      - name: Generate release log
+        run: |
+          PREV=$(git tag --sort=-creatordate --merged HEAD | grep -Fxv "$VERSION" | head -n 1 || true)
+          if [ -n "$PREV" ]; then
+            RANGE="$PREV..HEAD"
+          else
+            RANGE="HEAD"
+          fi
+          {
+            echo "$VERSION"
+            echo ""
+            echo "Build ID / Version Code: $BUILD_ID"
+            echo "Commit: $(git rev-parse --short HEAD)"
+            echo ""
+            git log --pretty=format:'%s' "$RANGE" | awk '
+              /^feat:/      { a[++na] = substr($0, 7); next }
+              /^fix:/       { f[++nf] = substr($0, 6); next }
+              /^[A-Za-z]+:/ { c[++nc] = substr($0, index($0, ":") + 2); next }
+              { o[++no] = $0 }
+              END {
+                if (na) { print "Added";   for (i = 1; i <= na; i++) print "- " a[i]; print "" }
+                if (nc) { print "Changed"; for (i = 1; i <= nc; i++) print "- " c[i]; print "" }
+                if (nf) { print "Fixed";   for (i = 1; i <= nf; i++) print "- " f[i]; print "" }
+                if (no) { print "Other";   for (i = 1; i <= no; i++) print "- " o[i]; print "" }
+              }'
+          } > release.md
+          cat release.md
+
+      - name: Upload release log
+        uses: actions/upload-artifact@v6
+        with:
+          name: Release-Log-${{ env.VERSION }}
+          path: release.md
 
       - name: Checkout code into separate directory
         uses: actions/checkout@v5
@@ -62,7 +104,7 @@ jobs:
           mkdir -p "./Analysis-Tool-For-HyperOS-Android-arm64/tools"
           mkdir -p "./Analysis-Tool-For-HyperOS-Android-x86_64/tools"
           mkdir -p "./Analysis-Tool-For-HyperOS-WSL-x86_64/tools"
-          
+
           cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Windows-x86_64/"
           cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Linux-arm64/"
           cp -r ./repo/* "./Analysis-Tool-For-HyperOS-Linux-x86_64/"
@@ -180,7 +222,7 @@ jobs:
         with:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-Windows-x86_64.zip
           path: ./Analysis-Tool-For-HyperOS-Windows-x86_64/*
-          
+
       - name: Download payload-dumper-go-Darwin-x86_64
         uses: robinraju/release-downloader@v1.13
         with:
@@ -361,10 +403,12 @@ jobs:
           name: Analysis-Tool-For-HyperOS-${{ env.VERSION }}-WSL-x86_64.zip
           path: ./Analysis-Tool-For-HyperOS-WSL-x86_64/*
 
+      # Alpha 只保留 Artifact；Beta 发预发布，Stable 发正式 Release
       - name: Release
-        if: ${{ !contains(github.ref, 'beta') }}
+        if: env.CHANNEL != 'alpha'
         uses: softprops/action-gh-release@v3
         with:
           body_path: './release.md'
           files: ./output/*
+          prerelease: ${{ env.CHANNEL == 'beta' }}
           token: ${{ secrets.GITHUB_TOKEN }}
