@@ -36,7 +36,31 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
       # 自托管工作区跨任务保留，checkout 默认 git clean -ffdx 清理上次残留
+
+    - name: Checkout latest stable release
+      run: |
+        TAG=$(git tag -l | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
+        if [ -z "$TAG" ]; then
+          echo "No stable release tag found"
+          exit 1
+        fi
+        echo "Using release: $TAG"
+        git checkout "$TAG"
+
+    - name: Install system dependencies
+      run: |
+        SUDO=""; [ "$(id -u)" = "0" ] || SUDO="sudo"
+        if ! command -v aria2c >/dev/null 2>&1; then
+          $SUDO apt-get update -qq
+          $SUDO apt-get install -y -qq aria2
+        fi
+        if ! command -v 7z >/dev/null 2>&1; then
+          $SUDO apt-get update -qq
+          $SUDO apt-get install -y -qq p7zip-full
+        fi
 
     - name: Download dependencies-Linux-x86_64
       uses: robinraju/release-downloader@v1.13
@@ -154,7 +178,7 @@ jobs:
         if [ "$PUSHDB" = "是" ]; then
           git commit -m "chore: update $DEVICENAME $OSVERSION by action [skip ci]" || exit 0
           git pull --rebase origin main || { git rebase --abort 2>/dev/null; exit 0; }
-          git push || exit 0
+          git push origin HEAD:main || exit 0
         fi
 
     - name: Get Info
