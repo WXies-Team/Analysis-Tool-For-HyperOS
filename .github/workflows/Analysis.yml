@@ -31,12 +31,13 @@ on:
 
 jobs:
   Analysis:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
-      
+      # 自托管工作区跨任务保留，checkout 默认 git clean -ffdx 清理上次残留
+
     - name: Download dependencies-Linux-x86_64
       uses: robinraju/release-downloader@v1.13
       with:
@@ -50,45 +51,41 @@ jobs:
         latest: true
         extract: true
         fileName: "erofs-utils-*Linux_x86_64*.zip"
-        
-    - name: Cache pip
-      uses: actions/cache@v5
-      with:
-        path: ~/.cache/pip
-        key: pip-${{ hashFiles('requirements.txt') }}
-        restore-keys: pip-
+
+    - name: Resolve device
+      env:
+        DEVICE: ${{ github.event.inputs.device }}
+      run: |
+        case "$DEVICE" in
+          Phone) arg=ph;  dir=phone;;
+          Pad)   arg=p;   dir=pad;;
+          Fold)  arg=f;   dir=fold;;
+          Flip)  arg=fp;  dir=flip;;
+          *) echo "Invalid device specified."; exit 1;;
+        esac
+        echo "DEVICE_ARG=$arg" >> "$GITHUB_ENV"
+        echo "DEVICE_DIR=$dir" >> "$GITHUB_ENV"
 
     - name: Install dependence
       run: |
-        mkdir tools
-        mv extract.erofs tools/
-        mv payload-dumper-go tools/
-
-        pip install -r requirements.txt
-
-    - name: Set permission
-      run: |
-       chmod +x ./tools/extract.erofs
-       chmod +x ./tools/payload-dumper-go
+        VENV="$HOME/.cache/ath-venv"
+        if [ ! -x "$VENV/bin/python" ]; then
+          python3 -m venv "$VENV"
+        fi
+        "$VENV/bin/pip" install -q -r requirements.txt
+        echo "$VENV/bin" >> "$GITHUB_PATH"
+        mkdir -p tools
+        mv extract.erofs payload-dumper-go tools/
+        chmod +x tools/extract.erofs tools/payload-dumper-go
 
     - name: Download ROM
+      env:
+        LINK: ${{ github.event.inputs.link }}
       run: |
-        python main.py -d "${{ github.event.inputs.link }}"
+        python main.py -d "$LINK"
 
     - name: Switch device type
-      run: |
-        if [ "${{ github.event.inputs.device }}" = "Phone" ]; then
-            python main.py -t 0 ph
-          elif [ "${{ github.event.inputs.device }}" = "Pad" ]; then
-            python main.py -t 0 p
-          elif [ "${{ github.event.inputs.device }}" = "Fold" ]; then
-            python main.py -t 0 f
-          elif [ "${{ github.event.inputs.device }}" = "Flip" ]; then
-            python main.py -t 0 fp
-          else
-            echo "Invalid device specified."
-            exit 1
-          fi
+      run: python main.py -t 0 "$DEVICE_ARG"
 
     - name: Unzip payload.bin
       run: |
@@ -99,14 +96,12 @@ jobs:
       run: |
         python main.py -i
         rm payload.bin
-    
+
     - name: Unzip file
-      run: |
-        python main.py -f
+      run: python main.py -f
 
     - name: Remove exclude apk
-      run: |
-        python main.py -a
+      run: python main.py -a
 
     - name: Upload special apk
       uses: actions/upload-artifact@v6
@@ -118,10 +113,9 @@ jobs:
           output_apk/MIUISecurityCenter.apk
           output_apk/MiuiHome.apk
           output_apk/AiAsstVision.apk
-          
+
     - name: Update database & rename
-      run: |
-        python main.py -n -u -m
+      run: python main.py -n -u -m
 
     - name: Upload database
       uses: actions/upload-artifact@v6
@@ -148,32 +142,21 @@ jobs:
 
     - name: Push database
       continue-on-error: true
+      env:
+        DEVICENAME: ${{ github.event.inputs.devicename }}
+        OSVERSION: ${{ github.event.inputs.osversion }}
+        PUSHDB: ${{ github.event.inputs.push }}
       run: |
-        python main.py -t 1 ph
-            git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-            git config --global user.name "${GITHUB_ACTOR}"
-        if [ "${{ github.event.inputs.device }}" = "Phone" ]; then
-            git add phone/
-          elif [ "${{ github.event.inputs.device }}" = "Pad" ]; then
-            git add pad/
-          elif [ "${{ github.event.inputs.device }}" = "Fold" ]; then
-            git add fold/
-          elif [ "${{ github.event.inputs.device }}" = "Flip" ]; then
-            git add flip/
-          else
-            exit 1
-          fi
-        if [ "${{ github.event.inputs.push }}" = "是" ]; then
-            git commit -m "chore: update ${{ github.event.inputs.devicename }} ${{ github.event.inputs.osversion }} by action [skip ci]" || exit 0
-            git pull --rebase origin main || { git rebase --abort 2>/dev/null; exit 0; }
-            git push || exit 0
-          elif [ "${{ github.event.inputs.push }}" = "否" ]; then
-            exit 0
-          else
-            exit 0
-          fi
-          
+        git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+        git config user.name "${GITHUB_ACTOR}"
+        python main.py -t 1 "$DEVICE_ARG"
+        git add "$DEVICE_DIR/"
+        if [ "$PUSHDB" = "是" ]; then
+          git commit -m "chore: update $DEVICENAME $OSVERSION by action [skip ci]" || exit 0
+          git pull --rebase origin main || { git rebase --abort 2>/dev/null; exit 0; }
+          git push || exit 0
+        fi
+
     - name: Get Info
       continue-on-error: true
-      run: |
-        python main.py -o
+      run: python main.py -o
