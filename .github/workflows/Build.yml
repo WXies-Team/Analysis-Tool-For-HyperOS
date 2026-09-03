@@ -68,15 +68,21 @@ jobs:
             echo "Build ID / Version Code: $BUILD_ID"
             echo "Commit: $(git rev-parse --short HEAD)"
             echo ""
-            git log --pretty=format:'%s' "$RANGE" | awk '
-              /^feat:/      { a[++na] = substr($0, 7); next }
-              /^fix:/       { f[++nf] = substr($0, 6); next }
-              /^[A-Za-z]+:/ { c[++nc] = substr($0, index($0, ":") + 2); next }
-              { o[++no] = $0 }
+            git log --pretty=format:'%s' "$RANGE" | awk -v CHANNEL="$CHANNEL" '
+              /^feat(\([^)]*\))?:/ { s = $0; sub(/^[A-Za-z]+(\([^)]*\))?:[ \t]*/, "", s); a[++na] = s; next }
+              /^fix(\([^)]*\))?:/  { s = $0; sub(/^[A-Za-z]+(\([^)]*\))?:[ \t]*/, "", s); f[++nf] = s; next }
+              {
+                s = $0
+                if ($0 ~ /^[A-Za-z]+(\([^)]*\))?:/) sub(/^[A-Za-z]+(\([^)]*\))?:[ \t]*/, "", s)
+                if (CHANNEL == "stable") { p[++np] = s }
+                else if ($0 ~ /^[A-Za-z]+(\([^)]*\))?:/) { c[++nc] = s }
+                else { o[++no] = s }
+              }
               END {
-                if (na) { print "Added";   for (i = 1; i <= na; i++) print "- " a[i]; print "" }
+                if (na) { print (CHANNEL == "stable" ? "New Features" : "Added");   for (i = 1; i <= na; i++) print "- " a[i]; print "" }
                 if (nc) { print "Changed"; for (i = 1; i <= nc; i++) print "- " c[i]; print "" }
-                if (nf) { print "Fixed";   for (i = 1; i <= nf; i++) print "- " f[i]; print "" }
+                if (np) { print "Improvements"; for (i = 1; i <= np; i++) print "- " p[i]; print "" }
+                if (nf) { print (CHANNEL == "stable" ? "Bug Fixes" : "Fixed");   for (i = 1; i <= nf; i++) print "- " f[i]; print "" }
                 if (no) { print "Other";   for (i = 1; i <= no; i++) print "- " o[i]; print "" }
               }'
           } > release.md
