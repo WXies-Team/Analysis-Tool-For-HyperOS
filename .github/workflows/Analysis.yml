@@ -128,7 +128,7 @@ jobs:
       run: python main.py -a
 
     - name: Upload special apk
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: Special_apk
         path: |
@@ -142,7 +142,7 @@ jobs:
       run: python main.py -n -u -m
 
     - name: Upload database
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: Database
         path: |
@@ -150,14 +150,14 @@ jobs:
           app_code.json
 
     - name: Upload build.prop
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: build.prop
         path: |
           product/etc/build.prop
 
     - name: Upload update apk
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: Update_apk
         path: |
