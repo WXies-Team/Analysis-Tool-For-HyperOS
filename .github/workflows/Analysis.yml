@@ -35,7 +35,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
       # 自托管工作区跨任务保留，checkout 默认 git clean -ffdx 清理上次残留
