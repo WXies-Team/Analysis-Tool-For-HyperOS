@@ -17,7 +17,15 @@
 
 ## 如何使用
 
-1. 前往 Release 下载对应平台压缩包：
+1. 下载对应平台的压缩包（二选一）：
+
+   - **下载中心（推荐，含内测/公测通道）**：<https://storage.horatio.cn/Analysis-Tool-For-HyperOS/>
+     - [正式版 stable](https://storage.horatio.cn/Analysis-Tool-For-HyperOS/stable/)
+     - [公测版 beta](https://storage.horatio.cn/Analysis-Tool-For-HyperOS/beta/)
+     - [内测版 alpha](https://storage.horatio.cn/Analysis-Tool-For-HyperOS/alpha/)（每次 push 自动构建）
+   - **GitHub Release**（仅正式版 / 公测版）：<https://github.com/WXies-Team/Analysis-Tool-For-HyperOS/releases>
+
+   压缩包内已自带 `tools/` 依赖（payload-dumper-go、extract.erofs），解压即用。
 
 2. 确保已安装 Python 3.x, aria2c, 7zip 并安装依赖库：
 
