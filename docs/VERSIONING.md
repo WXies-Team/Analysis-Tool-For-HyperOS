@@ -1946,17 +1946,17 @@ INDEX_README_TMP="$RUNNER_TEMP/hyperos_index_readme.md"
 cat << 'EOF' > "$INDEX_README_TMP"
 <div style="max-width: 780px; margin: 0 auto; padding: 4px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
 <div style="text-align: center; margin: 16px 0 20px 0;">
-<div style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">🔧 HyperOS 分析工具 下载中心</div>
-<div style="font-size: 13px; opacity: 0.75;">按需选择版本通道 · 各通道独立保留与更新 · 提供全平台压缩包</div>
+<div style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">🔧 Analysis Tool For HyperOS 下载中心</div>
+<div style="font-size: 13px; opacity: 0.75;">根据使用需求选择对应版本通道 · 各通道独立保留与更新</div>
 </div>
 <div style="display: flex; flex-direction: column; gap: 14px;">
 <a href="/Analysis-Tool-For-HyperOS/stable/" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-radius: 14px; border: 1px solid rgba(125,125,125,0.22); background: rgba(125,125,125,0.05); text-decoration: none; color: inherit; box-sizing: border-box;">
 <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0;">
 <div style="display: flex; align-items: center; gap: 8px;">
 <span style="font-size: 16px; font-weight: 600;">📁 正式版 (Stable)</span>
-<span style="font-size: 11px; padding: 2px 8px; border-radius: 20px; background: rgba(34,197,94,0.18); color: #16a34a; font-weight: 600;">推荐使用</span>
+<span style="font-size: 11px; padding: 2px 8px; border-radius: 20px; background: rgba(34,197,94,0.18); color: #16a34a; font-weight: 600;">推荐日常</span>
 </div>
-<div style="font-size: 13px; opacity: 0.75; line-height: 1.4;">经过验证的稳定版本 · 保留最新 3 版</div>
+<div style="font-size: 13px; opacity: 0.75; line-height: 1.4;">经过充分验证的稳定版本，功能完善且经过多轮测试 · 保留最新 3 版</div>
 </div>
 <div style="font-size: 13px; font-weight: 600; color: #16a34a; white-space: nowrap; margin-left: 16px; flex-shrink: 0;">进入通道 →</div>
 </a>
@@ -1966,7 +1966,7 @@ cat << 'EOF' > "$INDEX_README_TMP"
 <span style="font-size: 16px; font-weight: 600;">📁 公测版 (Beta)</span>
 <span style="font-size: 11px; padding: 2px 8px; border-radius: 20px; background: rgba(234,88,12,0.18); color: #ea580c; font-weight: 600;">先行尝鲜</span>
 </div>
-<div style="font-size: 13px; opacity: 0.75; line-height: 1.4;">包含已进入公测候选的新特性，欢迎体验与反馈 · 保留最新 2 版</div>
+<div style="font-size: 13px; opacity: 0.75; line-height: 1.4;">包含已进入公测候选的新特性与界面交互，欢迎体验与反馈 · 保留最新 2 版</div>
 </div>
 <div style="font-size: 13px; font-weight: 600; color: #ea580c; white-space: nowrap; margin-left: 16px; flex-shrink: 0;">进入通道 →</div>
 </a>
@@ -1974,9 +1974,9 @@ cat << 'EOF' > "$INDEX_README_TMP"
 <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0;">
 <div style="display: flex; align-items: center; gap: 8px;">
 <span style="font-size: 16px; font-weight: 600;">📁 内测版 (Alpha)</span>
-<span style="font-size: 11px; padding: 2px 8px; border-radius: 20px; background: rgba(147,51,234,0.18); color: #9333ea; font-weight: 600;">每次 Push 构建</span>
+<span style="font-size: 11px; padding: 2px 8px; border-radius: 20px; background: rgba(147,51,234,0.18); color: #9333ea; font-weight: 600;">每日构建</span>
 </div>
-<div style="font-size: 13px; opacity: 0.75; line-height: 1.4;">主分支每次 Push 自动构建，最新改动先睹为快 · 仅保留最新 1 版</div>
+<div style="font-size: 13px; opacity: 0.75; line-height: 1.4;">主分支自动化 CI 每次构建，提供全平台压缩包 · 仅保留最新 1 版</div>
 </div>
 <div style="font-size: 13px; font-weight: 600; color: #9333ea; white-space: nowrap; margin-left: 16px; flex-shrink: 0;">进入通道 →</div>
 </a>
@@ -2242,6 +2242,8 @@ on:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
       - '[0-9]+.[0-9]+.[0-9]+-beta.[0-9]+'
+    # workflow 自身与文档改动不触发打包（Dependabot 升级 actions、README 更新不白跑）
+    # tag 触发不受 paths 过滤影响（GitHub 不对 tag push 评估路径过滤）
     paths-ignore:
       # 纯文档：不产出任何字节差异，白跑一次全量打包只占 runner。
       # 这些 commit 会留在「上次成功构建..HEAD」区间里，但 release-log.sh
@@ -2250,6 +2252,7 @@ on:
       - 'docs/**'
       - '*.md'
       - '**/*.md'
+      - '.github/**'
   workflow_dispatch:
 
 permissions:
