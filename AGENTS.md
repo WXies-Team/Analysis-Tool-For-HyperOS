@@ -44,7 +44,7 @@ Runtime tools the scripts shell out to: `aria2c`, `7z`, plus `payload-dumper-go`
 
 ## Known pitfalls
 
-- **Upstream 500s**: CI pulls latest releases of `ssut/payload-dumper-go` and `sekaiacg/erofs-utils` via the GitHub API — when it flakes, the build goes red for no fault of this repo. **Just rerun.**
+- **Upstream 500s**: CI pulls latest releases of `ssut/payload-dumper-go` and `sekaiacg/erofs-tools` via the GitHub API — when it flakes, the build goes red for no fault of this repo. **Just rerun.**
 - **Withdrawn versions don't free their Build ID**: after rolling back `beta.2`, the next beta must be `beta.3`.
 - **The self-hosted runner's workspace persists across runs** — stale `output/` from a previous run can confuse local verification; check before trusting artifacts.
 - The JSON databases are the product's core data: `-t` (`move_json`) rewrites which device-class dictionary is active — know which class you're editing before running it locally.
