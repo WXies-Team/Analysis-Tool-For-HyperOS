@@ -2,7 +2,7 @@
 
 > 从 HyperOS ROM 提取、解包和重命名 APK，解压即用的跨平台工具
 
-[![build](https://github.com/WXies-Team/Analysis-Tool-For-HyperOS/actions/workflows/analysis.yml/badge.svg)](https://github.com/WXies-Team/Analysis-Tool-For-HyperOS/actions/workflows/analysis.yml) [![release](https://img.shields.io/github/v/release/WXies-Team/Analysis-Tool-For-HyperOS)](https://github.com/WXies-Team/Analysis-Tool-For-HyperOS/releases)
+[![build](https://github.com/WXies-Team/HyperApkExtractor/actions/workflows/analysis.yml/badge.svg)](https://github.com/WXies-Team/HyperApkExtractor/actions/workflows/analysis.yml) [![release](https://img.shields.io/github/v/release/WXies-Team/HyperApkExtractor)](https://github.com/WXies-Team/HyperApkExtractor/releases)
 
 一个处理 HyperOS ROM 的命令行工具：把 ROM 里的镜像解包，取出并整理系统 APK——改包名、改版本号、改文件名，按需清理。
 
@@ -39,12 +39,12 @@ python main.py [-h] [-d URL] [-p] [-i] [-f] [-t] [-a] [-n] [-u] [-m] [-c] [-o]
 
 | 版本 | 适合 | 下载 |
 | --- | --- | --- |
-| 📁 正式版 Stable | 日常使用，稳定优先（推荐） | [stable/](https://storage.horatio.cn/Analysis-Tool-For-HyperOS/stable/) · [GitHub Releases](https://github.com/WXies-Team/Analysis-Tool-For-HyperOS/releases) |
-| 📁 测试版 Beta | 想先试新功能、帮忙挑毛病 | [beta/](https://storage.horatio.cn/Analysis-Tool-For-HyperOS/beta/) |
+| 📁 正式版 Stable | 日常使用，稳定优先（推荐） | [stable/](https://storage.horatio.cn/HyperApkExtractor/stable/) · [GitHub Releases](https://github.com/WXies-Team/HyperApkExtractor/releases) |
+| 📁 测试版 Beta | 想先试新功能、帮忙挑毛病 | [beta/](https://storage.horatio.cn/HyperApkExtractor/beta/) |
 
 - 每个版本目录都附有这次更新了什么（CI 自动生成的更新说明）
 - 压缩包已自带 `tools/` 依赖（payload-dumper-go、extract.erofs），解压即用
-- 下载中心首页：[https://storage.horatio.cn/Analysis-Tool-For-HyperOS](https://storage.horatio.cn/Analysis-Tool-For-HyperOS/)
+- 下载中心首页：[https://storage.horatio.cn/HyperApkExtractor](https://storage.horatio.cn/HyperApkExtractor/)
 
 ## 自己运行
 
@@ -56,6 +56,6 @@ python main.py --help
 ```
 
 姊妹项目：
-- [Analysis Tool For ColorOS](https://github.com/WXies-Team/Analysis-Tool-For-ColorOS)
-- [Analysis Tool For HyperOS](https://github.com/WXies-Team/Analysis-Tool-For-HyperOS)
-- [Analysis Tool For OriginOS](https://github.com/WXies-Team/Analysis-Tool-For-OriginOS)
+- [Analysis Tool For ColorOS](https://github.com/WXies-Team/ColorApkExtractor)
+- [Analysis Tool For HyperOS](https://github.com/WXies-Team/HyperApkExtractor)
+- [Analysis Tool For OriginOS](https://github.com/WXies-Team/OriginApkExtractor)
